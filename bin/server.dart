@@ -1,22 +1,12 @@
 import 'dart:io';
 
+import 'package:postflow_server/handlers/check.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 // Configure routes.
-final _router = Router()
-  ..get('/', _rootHandler)
-  ..get('/echo/<message>', _echoHandler);
-
-Response _rootHandler(Request req) {
-  return Response.ok('Hello, World!\n');
-}
-
-Response _echoHandler(Request request) {
-  final message = request.params['message'];
-  return Response.ok('$message\n');
-}
+final _router = Router()..get('/check', checkHandler);
 
 void main(List<String> args) async {
   // Use any available host or container IP (usually `0.0.0.0`).
