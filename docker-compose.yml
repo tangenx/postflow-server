@@ -1,0 +1,40 @@
+services:
+  postflow-db:
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    container_name: postflow_db
+    restart: unless-stopped
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_INIT_ARGS: ${DB_INIT_ARGS}
+    volumes:
+      - ./init_scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postflow-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: postflow_server
+    restart: unless-stopped
+    ports:
+      - 5555:5555
+    depends_on:
+      postflow-db:
+        condition: service_healthy
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:5555/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
