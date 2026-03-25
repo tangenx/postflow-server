@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";   -- trigram search on names
 CREATE TYPE storage_type      AS ENUM ('local', 'remote');
 CREATE TYPE post_status       AS ENUM ('draft', 'ready', 'partial', 'archived');
 CREATE TYPE schedule_status   AS ENUM ('pending', 'publishing', 'published', 'failed', 'cancelled');
-CREATE TYPE identity_provider AS ENUM ('local', 'google', 'github', 'discord', 'telegram');
+CREATE TYPE identity_provider AS ENUM ('local', 'vk', 'github', 'discord', 'telegram');
 
 --  USERS
 
