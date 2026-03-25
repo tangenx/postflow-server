@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:postflow_server/di.dart';
 import 'package:postflow_server/handlers/check.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
@@ -9,6 +10,8 @@ import 'package:shelf_router/shelf_router.dart';
 final _router = Router()..get('/check', checkHandler);
 
 void main(List<String> args) async {
+  registerDependencies();
+
   // Use any available host or container IP (usually `0.0.0.0`).
   final ip = InternetAddress.anyIPv4;
 
