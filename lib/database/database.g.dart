@@ -16356,3 +16356,15 @@ class $PostflowDatabaseManager {
   $$PostCaptionsTableTableManager get postCaptions =>
       $$PostCaptionsTableTableManager(_db, _db.postCaptions);
 }
+
+mixin _$ArtistsDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $ArtistsTable get artists => attachedDatabase.artists;
+  ArtistsDaoManager get managers => ArtistsDaoManager(this);
+}
+
+class ArtistsDaoManager {
+  final _$ArtistsDaoMixin _db;
+  ArtistsDaoManager(this._db);
+  $$ArtistsTableTableManager get artists =>
+      $$ArtistsTableTableManager(_db.attachedDatabase, _db.artists);
+}

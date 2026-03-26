@@ -24,6 +24,7 @@ import 'tables/user_social_accounts.dart';
 import 'tables/users.dart';
 
 part 'database.g.dart';
+part './daos/artists_dao.dart';
 
 @DriftDatabase(
   tables: [
