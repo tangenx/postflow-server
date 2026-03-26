@@ -1,13 +1,18 @@
 import 'dart:io';
 
+import 'package:postflow_server/config/app_config.dart';
 import 'package:postflow_server/di.dart';
 import 'package:postflow_server/routes/router.dart';
+import 'package:postflow_server/services/jwt_service.dart';
 import 'package:shelf/shelf_io.dart';
 
 void main(List<String> args) async {
   registerDependencies();
 
-  final handler = buildRouter();
+  final handler = buildRouter(
+    config: getIt<AppConfig>(),
+    jwtService: getIt<JwtService>(),
+  );
 
   final ip = InternetAddress.anyIPv4;
 
