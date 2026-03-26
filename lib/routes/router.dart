@@ -4,6 +4,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../config/app_config.dart';
 import '../middlewares/auth_middleware.dart';
 import '../handlers/check.dart';
+import '../middlewares/error_middleware.dart';
 import '../services/jwt_service.dart';
 
 // TODO: require all handler classes
@@ -22,9 +23,9 @@ Handler buildRouter({
 
   router.all('/<path|.*>', (Request req) => Response.notFound('Not found'));
 
-  // TODO: auth middleware
   return Pipeline()
       .addMiddleware(logRequests())
+      .addMiddleware(errorMiddleware())
       .addMiddleware(authMiddleware(config, jwtService))
       .addHandler(router.call);
 }
