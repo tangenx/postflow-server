@@ -7,6 +7,10 @@ class AppConfig {
   final String dbUser;
   final String dbPassword;
   final bool authenticationEnabled;
+  final String jwtSecret;
+  final String jwtRefreshSecret;
+  final int jwtAccessTtl;
+  final int jwtRefreshTtl;
 
   const AppConfig({
     required this.dbName,
@@ -15,6 +19,10 @@ class AppConfig {
     required this.dbUser,
     required this.dbPassword,
     required this.authenticationEnabled,
+    required this.jwtSecret,
+    required this.jwtRefreshSecret,
+    required this.jwtAccessTtl,
+    required this.jwtRefreshTtl,
   });
 
   factory AppConfig.fromEnvironment(DotEnv env) {
@@ -35,6 +43,10 @@ class AppConfig {
       dbUser: getValue('DB_USER'),
       dbPassword: getValue('DB_PASSWORD'),
       authenticationEnabled: getValue('AUTHENTICATION_ENABLED') == 'true',
+      jwtSecret: getValue('JWT_SECRET'),
+      jwtRefreshSecret: getValue('JWT_REFRESH_SECRET'),
+      jwtAccessTtl: int.parse(getValue('JWT_ACCESS_TTL', fallback: '900')),
+      jwtRefreshTtl: int.parse(getValue('JWT_REFRESH_TTL', fallback: '604800')),
     );
   }
 }
