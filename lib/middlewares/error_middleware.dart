@@ -7,7 +7,7 @@ Middleware errorMiddleware() {
     return (Request request) {
       try {
         return handler(request);
-      } on UnathorizedException catch (e) {
+      } on UnauthorizedException catch (e) {
         return Response.unauthorized(e.toJson());
       } on ConflictException catch (e) {
         return Response(409, body: e.toJson());

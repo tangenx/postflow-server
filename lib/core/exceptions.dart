@@ -9,8 +9,8 @@ class AppException implements Exception {
   Map<String, String> toJson() => {'status': 'error', 'message': message};
 }
 
-class UnathorizedException extends AppException {
-  UnathorizedException(super.message);
+class UnauthorizedException extends AppException {
+  UnauthorizedException(super.message);
 }
 
 class ConflictException extends AppException {
