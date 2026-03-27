@@ -11,8 +11,8 @@ class JwtService {
   JwtService(AppConfig config)
     : _accessKey = SecretKey(config.jwtSecret),
       _refreshKey = SecretKey(config.jwtRefreshSecret),
-      _accessTtl = Duration(seconds: config.jwtAccessTtl),
-      _refreshTtl = Duration(seconds: config.jwtRefreshTtl);
+      _accessTtl = config.jwtAccessTtl,
+      _refreshTtl = config.jwtRefreshTtl;
 
   /// generates a short-lived access token for the given [userId]
   String generateAccessToken(String userId) {

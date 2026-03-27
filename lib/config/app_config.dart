@@ -9,8 +9,8 @@ class AppConfig {
   final bool authenticationEnabled;
   final String jwtSecret;
   final String jwtRefreshSecret;
-  final int jwtAccessTtl;
-  final int jwtRefreshTtl;
+  final Duration jwtAccessTtl;
+  final Duration jwtRefreshTtl;
 
   const AppConfig({
     required this.dbName,
@@ -45,8 +45,12 @@ class AppConfig {
       authenticationEnabled: getValue('AUTHENTICATION_ENABLED') == 'true',
       jwtSecret: getValue('JWT_SECRET'),
       jwtRefreshSecret: getValue('JWT_REFRESH_SECRET'),
-      jwtAccessTtl: int.parse(getValue('JWT_ACCESS_TTL', fallback: '900')),
-      jwtRefreshTtl: int.parse(getValue('JWT_REFRESH_TTL', fallback: '604800')),
+      jwtAccessTtl: Duration(
+        seconds: int.parse(getValue('JWT_ACCESS_TTL', fallback: '1800')),
+      ),
+      jwtRefreshTtl: Duration(
+        days: int.parse(getValue('JWT_REFRESH_TTL', fallback: '604800')),
+      ),
     );
   }
 }
