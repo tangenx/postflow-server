@@ -16368,3 +16368,48 @@ class ArtistsDaoManager {
   $$ArtistsTableTableManager get artists =>
       $$ArtistsTableTableManager(_db.attachedDatabase, _db.artists);
 }
+
+mixin _$UsersDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  UsersDaoManager get managers => UsersDaoManager(this);
+}
+
+class UsersDaoManager {
+  final _$UsersDaoMixin _db;
+  UsersDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+}
+
+mixin _$UserIdentitiesDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $UserIdentitiesTable get userIdentities => attachedDatabase.userIdentities;
+  UserIdentitiesDaoManager get managers => UserIdentitiesDaoManager(this);
+}
+
+class UserIdentitiesDaoManager {
+  final _$UserIdentitiesDaoMixin _db;
+  UserIdentitiesDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$UserIdentitiesTableTableManager get userIdentities =>
+      $$UserIdentitiesTableTableManager(
+        _db.attachedDatabase,
+        _db.userIdentities,
+      );
+}
+
+mixin _$RefreshTokensDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $RefreshTokensTable get refreshTokens => attachedDatabase.refreshTokens;
+  RefreshTokensDaoManager get managers => RefreshTokensDaoManager(this);
+}
+
+class RefreshTokensDaoManager {
+  final _$RefreshTokensDaoMixin _db;
+  RefreshTokensDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$RefreshTokensTableTableManager get refreshTokens =>
+      $$RefreshTokensTableTableManager(_db.attachedDatabase, _db.refreshTokens);
+}

@@ -25,6 +25,9 @@ import 'tables/users.dart';
 
 part 'database.g.dart';
 part './daos/artists_dao.dart';
+part './daos/users_dao.dart';
+part './daos/user_identities_dao.dart';
+part './daos/refresh_tokens_dao.dart';
 
 @DriftDatabase(
   tables: [
