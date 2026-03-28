@@ -4,6 +4,9 @@ import 'package:shelf/shelf.dart';
 
 import '../database/database.dart';
 import '../di.dart';
+import '../utils/logger.dart';
+
+const _log = Logger('Health');
 
 Future<Response> healthHandler(Request request) async {
   try {
@@ -13,8 +16,9 @@ Future<Response> healthHandler(Request request) async {
       headers: {'content-type': 'application/json'},
     );
   } catch (e) {
+    _log.error('Database unreachable', e);
     return Response.internalServerError(
-      body: {'status': 'error', 'database': 'unreachable'},
+      body: jsonEncode({'status': 'error', 'database': 'unreachable'}),
       headers: {'content-type': 'application/json'},
     );
   }
