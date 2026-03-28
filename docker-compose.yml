@@ -6,9 +6,9 @@ services:
     container_name: postflow_db
     restart: unless-stopped
     environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       DB_INIT_ARGS: ${DB_INIT_ARGS}
     volumes:
       - postflow-db-data:/var/lib/postgresql/data
@@ -36,6 +36,12 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      SERVER_PORT: ${SERVER_PORT}
+      AUTHENTICATION_ENABLED: ${AUTHENTICATION_ENABLED}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL}
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:5555/health"]
       interval: 10s
