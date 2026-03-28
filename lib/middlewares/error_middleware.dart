@@ -1,6 +1,9 @@
 import 'package:shelf/shelf.dart';
 
 import '../core/exceptions.dart';
+import '../utils/logger.dart';
+
+final _logger = Logger('errorMiddleware');
 
 Middleware errorMiddleware() {
   return (Handler handler) {
@@ -16,8 +19,7 @@ Middleware errorMiddleware() {
       } on ValidationException catch (e) {
         return Response.badRequest(body: e.toJson());
       } catch (e, s) {
-        print('Unhandled error: $e\n$s');
-
+        _logger.error('Unhandled error', e, s);
         return Response.internalServerError(body: e.toString());
       }
     };
