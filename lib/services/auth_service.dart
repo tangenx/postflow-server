@@ -2,6 +2,7 @@ import 'package:drift_postgres/drift_postgres.dart';
 
 import '../core/exceptions.dart';
 import '../database/database.dart';
+import '../utils/hash_utils.dart';
 import '../utils/password_utils.dart';
 import 'jwt_service.dart';
 
@@ -72,6 +73,17 @@ class AuthService {
     return _issueTokens(user.id);
   }
 
+  Future<void> logout(String refreshToken) async {
+    final userId = _jwtService.verifyRefreshToken(refreshToken);
+
+    if (userId == null) {
+      throw UnauthorizedException('Invalid refresh token');
+    }
+
+    final hash = HashUtils.sha256hash(refreshToken);
+    await _refreshTokensDao.revokeByHash(hash);
+  }
+
   // TODO: login using social account (oauth)
 
   // refresh the access token
@@ -82,7 +94,10 @@ class AuthService {
       throw UnauthorizedException('Invalid refresh token');
     }
 
-    final storedRefreshToken = await _refreshTokensDao.findByHash(refreshToken);
+    final tokenHash = HashUtils.sha256hash(refreshToken);
+    final storedRefreshToken = await _refreshTokensDao.findValidByHash(
+      tokenHash,
+    );
     if (storedRefreshToken == null) {
       throw UnauthorizedException('Invalid refresh token');
     }
@@ -103,7 +118,7 @@ class AuthService {
 
     await _refreshTokensDao.store(
       userId,
-      refrestToken,
+      HashUtils.sha256hash(refrestToken),
       DateTime.now().add(Duration(days: 30)),
     );
 

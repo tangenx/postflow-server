@@ -23,11 +23,11 @@ import 'tables/user_identities.dart';
 import 'tables/user_social_accounts.dart';
 import 'tables/users.dart';
 
-part 'database.g.dart';
 part './daos/artists_dao.dart';
-part './daos/users_dao.dart';
-part './daos/user_identities_dao.dart';
 part './daos/refresh_tokens_dao.dart';
+part './daos/user_identities_dao.dart';
+part './daos/users_dao.dart';
+part 'database.g.dart';
 
 @DriftDatabase(
   tables: [
@@ -59,7 +59,7 @@ class PostflowDatabase extends _$PostflowDatabase {
   int get schemaVersion => 1;
 
   static QueryExecutor _openConnection() {
-    final config = getIt<AppConfig>();
+    final config = sl<AppConfig>();
 
     return PgDatabase(
       settings: pg.ConnectionSettings(

@@ -15,15 +15,29 @@ class RefreshTokensDao extends DatabaseAccessor<PostflowDatabase>
     await into(refreshTokens).insert(refreshToken);
   }
 
-  Future<RefreshToken?> findByHash(String tokenHash) async {
-    final refreshToken = await (select(
-      refreshTokens,
-    )..where((t) => t.tokenHash.equals(tokenHash))).getSingleOrNull();
+  Future<RefreshToken?> findValidByHash(String tokenHash) async {
+    final now = DateTime.now();
+
+    final refreshToken =
+        await (select(refreshTokens)..where(
+              (t) =>
+                  t.tokenHash.equals(tokenHash) &
+                  t.expiresAt.isBiggerThan(Variable(PgDateTime(now))) &
+                  t.revokedAt.isNull(),
+            ))
+            .getSingleOrNull();
 
     return refreshToken;
   }
 
+  /// revoke the refresh token by token id from the database
   Future<int> revoke(UuidValue id) {
     return (delete(refreshTokens)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<int> revokeByHash(String tokenHash) {
+    return (delete(
+      refreshTokens,
+    )..where((t) => t.tokenHash.equals(tokenHash))).go();
   }
 }
