@@ -11,6 +11,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_INIT_ARGS: ${DB_INIT_ARGS}
     volumes:
+      - postflow-db-data:/var/lib/postgresql/data
       - ./init_scripts:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
@@ -46,3 +47,6 @@ services:
 networks:
   internal:
     driver: bridge
+
+volumes:
+  postflow-db-data:
