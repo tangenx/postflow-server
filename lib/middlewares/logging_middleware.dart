@@ -8,13 +8,20 @@ Middleware loggingMiddleware() {
   return (Handler handler) {
     return (Request request) async {
       final sw = Stopwatch()..start();
-      _logger.info('--> ${request.method} ${request.requestedUri.path}');
+      final from =
+          request.headers['x-forwarded-for'] ??
+          request.headers['x-real-ip'] ??
+          request.requestedUri.host;
+      final colorFrom = '${AnsiColor.green}$from${AnsiColor.reset}';
+      _logger.info(
+        '$colorFrom --> ${request.method} ${request.requestedUri.path}',
+      );
 
       final response = await handler(request);
 
       sw.stop();
       _logger.info(
-        '<-- ${request.method} ${request.requestedUri.path} '
+        '$colorFrom <-- ${request.method} ${request.requestedUri.path} '
         '${response.statusCode} ${sw.elapsedMilliseconds}ms',
       );
 

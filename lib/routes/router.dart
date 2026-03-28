@@ -8,6 +8,7 @@ import '../handlers/auth_handler.dart';
 import '../middlewares/auth_middleware.dart';
 import '../handlers/check.dart';
 import '../middlewares/error_middleware.dart';
+import '../middlewares/logging_middleware.dart';
 import '../services/jwt_service.dart';
 
 // TODO: require all handler classes
@@ -27,7 +28,7 @@ Handler buildRouter() {
   router.all('/<path|.*>', (Request req) => Response.notFound('Not found'));
 
   return Pipeline()
-      .addMiddleware(logRequests())
+      .addMiddleware(loggingMiddleware())
       .addMiddleware(errorMiddleware())
       .addMiddleware(authMiddleware(config, jwtService))
       .addHandler(router.call);
