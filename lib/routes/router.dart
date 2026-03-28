@@ -6,7 +6,7 @@ import '../config/app_config.dart';
 import '../di.dart';
 import '../handlers/auth_handler.dart';
 import '../middlewares/auth_middleware.dart';
-import '../handlers/check.dart';
+import '../handlers/health.dart';
 import '../middlewares/error_middleware.dart';
 import '../middlewares/logging_middleware.dart';
 import '../services/jwt_service.dart';
@@ -23,7 +23,7 @@ Handler buildRouter() {
   // router.mount('/api/media', handler);
   // router.mount('/api/schedules', handler);
   // router.mount('/api/', references);
-  router.get('/api/check', checkHandler);
+  router.get('/health', healthHandler);
 
   router.all('/<path|.*>', (Request req) => Response.notFound('Not found'));
 
