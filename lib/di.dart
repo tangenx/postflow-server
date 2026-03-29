@@ -33,6 +33,7 @@ void registerDependencies() {
       jwtService: sl<JwtService>(),
       usersDao: sl<UsersDao>(),
       refreshTokensDao: sl<RefreshTokensDao>(),
+      config: sl<AppConfig>(),
     ),
   );
 

@@ -1,5 +1,6 @@
 import 'package:drift_postgres/drift_postgres.dart';
 
+import '../config/app_config.dart';
 import '../core/exceptions.dart';
 import '../database/database.dart';
 import '../utils/hash_utils.dart';
@@ -11,16 +12,19 @@ class AuthService {
   final UserIdentitiesDao _userIdentitiesDao;
   final RefreshTokensDao _refreshTokensDao;
   final JwtService _jwtService;
+  final AppConfig _config;
 
   AuthService({
     required UserIdentitiesDao userIdentitiesDao,
     required JwtService jwtService,
     required UsersDao usersDao,
     required RefreshTokensDao refreshTokensDao,
+    required AppConfig config,
   }) : _refreshTokensDao = refreshTokensDao,
        _usersDao = usersDao,
        _jwtService = jwtService,
-       _userIdentitiesDao = userIdentitiesDao;
+       _userIdentitiesDao = userIdentitiesDao,
+       _config = config;
 
   // registration using username and password
   Future<AuthData> register(
@@ -74,12 +78,6 @@ class AuthService {
   }
 
   Future<void> logout(String refreshToken) async {
-    final userId = _jwtService.verifyRefreshToken(refreshToken);
-
-    if (userId == null) {
-      throw UnauthorizedException('Invalid refresh token');
-    }
-
     final hash = HashUtils.sha256hash(refreshToken);
     await _refreshTokensDao.revokeByHash(hash);
   }
@@ -88,12 +86,6 @@ class AuthService {
 
   // refresh the access token
   Future<AuthData> refresh(String refreshToken) async {
-    final userId = _jwtService.verifyRefreshToken(refreshToken);
-
-    if (userId == null) {
-      throw UnauthorizedException('Invalid refresh token');
-    }
-
     final tokenHash = HashUtils.sha256hash(refreshToken);
     final storedRefreshToken = await _refreshTokensDao.findValidByHash(
       tokenHash,
@@ -119,7 +111,7 @@ class AuthService {
     await _refreshTokensDao.store(
       userId,
       HashUtils.sha256hash(refrestToken),
-      DateTime.now().add(Duration(days: 30)),
+      DateTime.now().add(_config.jwtRefreshTtl),
     );
 
     return AuthData(accessToken: accessToken, refreshToken: refrestToken);
