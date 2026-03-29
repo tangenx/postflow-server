@@ -10,7 +10,7 @@ class ApiResponse {
   }) {
     return Response(
       status,
-      body: jsonEncode({'ok': true, 'data': data}),
+      body: jsonEncode({'ok': true, 'data': ?data}),
       headers: {'content-type': 'application/json', ...?headers},
     );
   }
