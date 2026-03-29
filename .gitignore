@@ -4,3 +4,5 @@
 .omc
 .vscode
 .env
+.DS_Store
+build/
