@@ -8,7 +8,6 @@ class AppConfig {
   final String dbPassword;
   final bool authenticationEnabled;
   final String jwtSecret;
-  final String jwtRefreshSecret;
   final Duration jwtAccessTtl;
   final Duration jwtRefreshTtl;
 
@@ -20,7 +19,6 @@ class AppConfig {
     required this.dbPassword,
     required this.authenticationEnabled,
     required this.jwtSecret,
-    required this.jwtRefreshSecret,
     required this.jwtAccessTtl,
     required this.jwtRefreshTtl,
   });
@@ -44,7 +42,6 @@ class AppConfig {
       dbPassword: getValue('DB_PASSWORD'),
       authenticationEnabled: getValue('AUTHENTICATION_ENABLED') == 'true',
       jwtSecret: getValue('JWT_SECRET'),
-      jwtRefreshSecret: getValue('JWT_REFRESH_SECRET'),
       jwtAccessTtl: Duration(
         seconds: int.parse(getValue('JWT_ACCESS_TTL', fallback: '1800')),
       ),
