@@ -16,13 +16,13 @@ class RefreshTokensDao extends DatabaseAccessor<PostflowDatabase>
   }
 
   Future<RefreshToken?> findValidByHash(String tokenHash) async {
-    final now = DateTime.now();
+    final now = const CustomExpression<PgDateTime>('NOW()');
 
     final refreshToken =
         await (select(refreshTokens)..where(
               (t) =>
                   t.tokenHash.equals(tokenHash) &
-                  t.expiresAt.isBiggerThan(Variable(PgDateTime(now))) &
+                  t.expiresAt.isBiggerThan(now) &
                   t.revokedAt.isNull(),
             ))
             .getSingleOrNull();
