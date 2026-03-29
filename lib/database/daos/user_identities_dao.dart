@@ -24,7 +24,7 @@ class UserIdentitiesDao extends DatabaseAccessor<PostflowDatabase>
         await (select(userIdentities)..where(
               (t) =>
                   t.userId.equals(userId) &
-                  t.provider.equals(IdentityProvider.local.name),
+                  t.provider.equals(IdentityProvider.local),
             ))
             .getSingleOrNull();
 

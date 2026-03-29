@@ -447,15 +447,18 @@ class $UserIdentitiesTable extends UserIdentities
       'REFERENCES users (id)',
     ),
   );
-  @override
-  late final GeneratedColumnWithTypeConverter<IdentityProvider, String>
-  provider = GeneratedColumn<String>(
+  static const VerificationMeta _providerMeta = const VerificationMeta(
     'provider',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  ).withConverter<IdentityProvider>($UserIdentitiesTable.$converterprovider);
+  );
+  @override
+  late final GeneratedColumn<IdentityProvider> provider =
+      GeneratedColumn<IdentityProvider>(
+        'provider',
+        aliasedName,
+        false,
+        type: identityProviderType,
+        requiredDuringInsert: true,
+      );
   static const VerificationMeta _providerSubjectMeta = const VerificationMeta(
     'providerSubject',
   );
@@ -523,6 +526,14 @@ class $UserIdentitiesTable extends UserIdentities
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
+    if (data.containsKey('provider')) {
+      context.handle(
+        _providerMeta,
+        provider.isAcceptableOrUnknown(data['provider']!, _providerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_providerMeta);
+    }
     if (data.containsKey('provider_subject')) {
       context.handle(
         _providerSubjectMeta,
@@ -569,12 +580,10 @@ class $UserIdentitiesTable extends UserIdentities
         PgTypes.uuid,
         data['${effectivePrefix}user_id'],
       )!,
-      provider: $UserIdentitiesTable.$converterprovider.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}provider'],
-        )!,
-      ),
+      provider: attachedDatabase.typeMapping.read(
+        identityProviderType,
+        data['${effectivePrefix}provider'],
+      )!,
       providerSubject: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}provider_subject'],
@@ -594,11 +603,6 @@ class $UserIdentitiesTable extends UserIdentities
   $UserIdentitiesTable createAlias(String alias) {
     return $UserIdentitiesTable(attachedDatabase, alias);
   }
-
-  static JsonTypeConverter2<IdentityProvider, String, String>
-  $converterprovider = const EnumNameConverter<IdentityProvider>(
-    IdentityProvider.values,
-  );
 }
 
 class UserIdentity extends DataClass implements Insertable<UserIdentity> {
@@ -621,11 +625,10 @@ class UserIdentity extends DataClass implements Insertable<UserIdentity> {
     final map = <String, Expression>{};
     map['id'] = Variable<UuidValue>(id, PgTypes.uuid);
     map['user_id'] = Variable<UuidValue>(userId, PgTypes.uuid);
-    {
-      map['provider'] = Variable<String>(
-        $UserIdentitiesTable.$converterprovider.toSql(provider),
-      );
-    }
+    map['provider'] = Variable<IdentityProvider>(
+      provider,
+      identityProviderType,
+    );
     if (!nullToAbsent || providerSubject != null) {
       map['provider_subject'] = Variable<String>(providerSubject);
     }
@@ -662,9 +665,7 @@ class UserIdentity extends DataClass implements Insertable<UserIdentity> {
     return UserIdentity(
       id: serializer.fromJson<UuidValue>(json['id']),
       userId: serializer.fromJson<UuidValue>(json['userId']),
-      provider: $UserIdentitiesTable.$converterprovider.fromJson(
-        serializer.fromJson<String>(json['provider']),
-      ),
+      provider: serializer.fromJson<IdentityProvider>(json['provider']),
       providerSubject: serializer.fromJson<String?>(json['providerSubject']),
       passwordHash: serializer.fromJson<String?>(json['passwordHash']),
       createdAt: serializer.fromJson<PgDateTime>(json['createdAt']),
@@ -676,9 +677,7 @@ class UserIdentity extends DataClass implements Insertable<UserIdentity> {
     return <String, dynamic>{
       'id': serializer.toJson<UuidValue>(id),
       'userId': serializer.toJson<UuidValue>(userId),
-      'provider': serializer.toJson<String>(
-        $UserIdentitiesTable.$converterprovider.toJson(provider),
-      ),
+      'provider': serializer.toJson<IdentityProvider>(provider),
       'providerSubject': serializer.toJson<String?>(providerSubject),
       'passwordHash': serializer.toJson<String?>(passwordHash),
       'createdAt': serializer.toJson<PgDateTime>(createdAt),
@@ -781,7 +780,7 @@ class UserIdentitiesCompanion extends UpdateCompanion<UserIdentity> {
   static Insertable<UserIdentity> custom({
     Expression<UuidValue>? id,
     Expression<UuidValue>? userId,
-    Expression<String>? provider,
+    Expression<IdentityProvider>? provider,
     Expression<String>? providerSubject,
     Expression<String>? passwordHash,
     Expression<PgDateTime>? createdAt,
@@ -828,8 +827,9 @@ class UserIdentitiesCompanion extends UpdateCompanion<UserIdentity> {
       map['user_id'] = Variable<UuidValue>(userId.value, PgTypes.uuid);
     }
     if (provider.present) {
-      map['provider'] = Variable<String>(
-        $UserIdentitiesTable.$converterprovider.toSql(provider.value),
+      map['provider'] = Variable<IdentityProvider>(
+        provider.value,
+        identityProviderType,
       );
     }
     if (providerSubject.present) {
@@ -4231,16 +4231,19 @@ class $MediaFilesTable extends MediaFiles
           'REFERENCES media_types (id)',
         ),
       );
+  static const VerificationMeta _storageTypeMeta = const VerificationMeta(
+    'storageType',
+  );
   @override
-  late final GeneratedColumnWithTypeConverter<StorageType, String> storageType =
-      GeneratedColumn<String>(
+  late final GeneratedColumn<StorageType> storageType =
+      GeneratedColumn<StorageType>(
         'storage_type',
         aliasedName,
         false,
-        type: DriftSqlType.string,
+        type: storageTypeType,
         requiredDuringInsert: false,
-        defaultValue: Constant(StorageType.local.name),
-      ).withConverter<StorageType>($MediaFilesTable.$converterstorageType);
+        defaultValue: Constant(StorageType.local, storageTypeType),
+      );
   static const VerificationMeta _storagePathMeta = const VerificationMeta(
     'storagePath',
   );
@@ -4357,6 +4360,15 @@ class $MediaFilesTable extends MediaFiles
     } else if (isInserting) {
       context.missing(_mediaTypeIdMeta);
     }
+    if (data.containsKey('storage_type')) {
+      context.handle(
+        _storageTypeMeta,
+        storageType.isAcceptableOrUnknown(
+          data['storage_type']!,
+          _storageTypeMeta,
+        ),
+      );
+    }
     if (data.containsKey('storage_path')) {
       context.handle(
         _storagePathMeta,
@@ -4423,12 +4435,10 @@ class $MediaFilesTable extends MediaFiles
         PgTypes.uuid,
         data['${effectivePrefix}media_type_id'],
       )!,
-      storageType: $MediaFilesTable.$converterstorageType.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}storage_type'],
-        )!,
-      ),
+      storageType: attachedDatabase.typeMapping.read(
+        storageTypeType,
+        data['${effectivePrefix}storage_type'],
+      )!,
       storagePath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}storage_path'],
@@ -4460,9 +4470,6 @@ class $MediaFilesTable extends MediaFiles
   $MediaFilesTable createAlias(String alias) {
     return $MediaFilesTable(attachedDatabase, alias);
   }
-
-  static JsonTypeConverter2<StorageType, String, String> $converterstorageType =
-      const EnumNameConverter<StorageType>(StorageType.values);
 }
 
 class MediaFile extends DataClass implements Insertable<MediaFile> {
@@ -4494,11 +4501,7 @@ class MediaFile extends DataClass implements Insertable<MediaFile> {
     map['id'] = Variable<UuidValue>(id, PgTypes.uuid);
     map['uploaded_by'] = Variable<UuidValue>(uploadedBy, PgTypes.uuid);
     map['media_type_id'] = Variable<UuidValue>(mediaTypeId, PgTypes.uuid);
-    {
-      map['storage_type'] = Variable<String>(
-        $MediaFilesTable.$converterstorageType.toSql(storageType),
-      );
-    }
+    map['storage_type'] = Variable<StorageType>(storageType, storageTypeType);
     if (!nullToAbsent || storagePath != null) {
       map['storage_path'] = Variable<String>(storagePath);
     }
@@ -4551,9 +4554,7 @@ class MediaFile extends DataClass implements Insertable<MediaFile> {
       id: serializer.fromJson<UuidValue>(json['id']),
       uploadedBy: serializer.fromJson<UuidValue>(json['uploadedBy']),
       mediaTypeId: serializer.fromJson<UuidValue>(json['mediaTypeId']),
-      storageType: $MediaFilesTable.$converterstorageType.fromJson(
-        serializer.fromJson<String>(json['storageType']),
-      ),
+      storageType: serializer.fromJson<StorageType>(json['storageType']),
       storagePath: serializer.fromJson<String?>(json['storagePath']),
       sourceUrl: serializer.fromJson<String?>(json['sourceUrl']),
       originalFilename: serializer.fromJson<String?>(json['originalFilename']),
@@ -4569,9 +4570,7 @@ class MediaFile extends DataClass implements Insertable<MediaFile> {
       'id': serializer.toJson<UuidValue>(id),
       'uploadedBy': serializer.toJson<UuidValue>(uploadedBy),
       'mediaTypeId': serializer.toJson<UuidValue>(mediaTypeId),
-      'storageType': serializer.toJson<String>(
-        $MediaFilesTable.$converterstorageType.toJson(storageType),
-      ),
+      'storageType': serializer.toJson<StorageType>(storageType),
       'storagePath': serializer.toJson<String?>(storagePath),
       'sourceUrl': serializer.toJson<String?>(sourceUrl),
       'originalFilename': serializer.toJson<String?>(originalFilename),
@@ -4726,7 +4725,7 @@ class MediaFilesCompanion extends UpdateCompanion<MediaFile> {
     Expression<UuidValue>? id,
     Expression<UuidValue>? uploadedBy,
     Expression<UuidValue>? mediaTypeId,
-    Expression<String>? storageType,
+    Expression<StorageType>? storageType,
     Expression<String>? storagePath,
     Expression<String>? sourceUrl,
     Expression<String>? originalFilename,
@@ -4794,8 +4793,9 @@ class MediaFilesCompanion extends UpdateCompanion<MediaFile> {
       );
     }
     if (storageType.present) {
-      map['storage_type'] = Variable<String>(
-        $MediaFilesTable.$converterstorageType.toSql(storageType.value),
+      map['storage_type'] = Variable<StorageType>(
+        storageType.value,
+        storageTypeType,
       );
     }
     if (storagePath.present) {
@@ -5411,16 +5411,16 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  late final GeneratedColumnWithTypeConverter<PostStatus, String> status =
-      GeneratedColumn<String>(
-        'status',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-        defaultValue: Constant(PostStatus.draft.name),
-      ).withConverter<PostStatus>($PostsTable.$converterstatus);
+  late final GeneratedColumn<PostStatus> status = GeneratedColumn<PostStatus>(
+    'status',
+    aliasedName,
+    false,
+    type: postStatusType,
+    requiredDuringInsert: false,
+    defaultValue: Constant(PostStatus.draft, postStatusType),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -5498,6 +5498,12 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
         ),
       );
     }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -5535,12 +5541,10 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
-      status: $PostsTable.$converterstatus.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}status'],
-        )!,
-      ),
+      status: attachedDatabase.typeMapping.read(
+        postStatusType,
+        data['${effectivePrefix}status'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         PgTypes.timestampWithTimezone,
         data['${effectivePrefix}created_at'],
@@ -5556,9 +5560,6 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
   $PostsTable createAlias(String alias) {
     return $PostsTable(attachedDatabase, alias);
   }
-
-  static JsonTypeConverter2<PostStatus, String, String> $converterstatus =
-      const EnumNameConverter<PostStatus>(PostStatus.values);
 }
 
 class Post extends DataClass implements Insertable<Post> {
@@ -5589,11 +5590,7 @@ class Post extends DataClass implements Insertable<Post> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    {
-      map['status'] = Variable<String>(
-        $PostsTable.$converterstatus.toSql(status),
-      );
-    }
+    map['status'] = Variable<PostStatus>(status, postStatusType);
     map['created_at'] = Variable<PgDateTime>(
       createdAt,
       PgTypes.timestampWithTimezone,
@@ -5631,9 +5628,7 @@ class Post extends DataClass implements Insertable<Post> {
       createdBy: serializer.fromJson<UuidValue>(json['createdBy']),
       internalNote: serializer.fromJson<String?>(json['internalNote']),
       description: serializer.fromJson<String?>(json['description']),
-      status: $PostsTable.$converterstatus.fromJson(
-        serializer.fromJson<String>(json['status']),
-      ),
+      status: serializer.fromJson<PostStatus>(json['status']),
       createdAt: serializer.fromJson<PgDateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<PgDateTime>(json['updatedAt']),
     );
@@ -5646,9 +5641,7 @@ class Post extends DataClass implements Insertable<Post> {
       'createdBy': serializer.toJson<UuidValue>(createdBy),
       'internalNote': serializer.toJson<String?>(internalNote),
       'description': serializer.toJson<String?>(description),
-      'status': serializer.toJson<String>(
-        $PostsTable.$converterstatus.toJson(status),
-      ),
+      'status': serializer.toJson<PostStatus>(status),
       'createdAt': serializer.toJson<PgDateTime>(createdAt),
       'updatedAt': serializer.toJson<PgDateTime>(updatedAt),
     };
@@ -5758,7 +5751,7 @@ class PostsCompanion extends UpdateCompanion<Post> {
     Expression<UuidValue>? createdBy,
     Expression<String>? internalNote,
     Expression<String>? description,
-    Expression<String>? status,
+    Expression<PostStatus>? status,
     Expression<PgDateTime>? createdAt,
     Expression<PgDateTime>? updatedAt,
     Expression<int>? rowid,
@@ -5813,9 +5806,7 @@ class PostsCompanion extends UpdateCompanion<Post> {
       map['description'] = Variable<String>(description.value);
     }
     if (status.present) {
-      map['status'] = Variable<String>(
-        $PostsTable.$converterstatus.toSql(status.value),
-      );
+      map['status'] = Variable<PostStatus>(status.value, postStatusType);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<PgDateTime>(
@@ -6755,16 +6746,17 @@ class $PostSchedulesTable extends PostSchedules
         type: PgTypes.timestampWithTimezone,
         requiredDuringInsert: true,
       );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  late final GeneratedColumnWithTypeConverter<ScheduleStatus, String> status =
-      GeneratedColumn<String>(
+  late final GeneratedColumn<ScheduleStatus> status =
+      GeneratedColumn<ScheduleStatus>(
         'status',
         aliasedName,
         false,
-        type: DriftSqlType.string,
+        type: scheduleStatusType,
         requiredDuringInsert: false,
-        defaultValue: Constant(ScheduleStatus.pending.name),
-      ).withConverter<ScheduleStatus>($PostSchedulesTable.$converterstatus);
+        defaultValue: Constant(ScheduleStatus.pending, scheduleStatusType),
+      );
   static const VerificationMeta _externalPostIdMeta = const VerificationMeta(
     'externalPostId',
   );
@@ -6883,6 +6875,12 @@ class $PostSchedulesTable extends PostSchedules
     } else if (isInserting) {
       context.missing(_scheduledAtMeta);
     }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
     if (data.containsKey('external_post_id')) {
       context.handle(
         _externalPostIdMeta,
@@ -6947,12 +6945,10 @@ class $PostSchedulesTable extends PostSchedules
         PgTypes.timestampWithTimezone,
         data['${effectivePrefix}scheduled_at'],
       )!,
-      status: $PostSchedulesTable.$converterstatus.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}status'],
-        )!,
-      ),
+      status: attachedDatabase.typeMapping.read(
+        scheduleStatusType,
+        data['${effectivePrefix}status'],
+      )!,
       externalPostId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}external_post_id'],
@@ -6980,9 +6976,6 @@ class $PostSchedulesTable extends PostSchedules
   $PostSchedulesTable createAlias(String alias) {
     return $PostSchedulesTable(attachedDatabase, alias);
   }
-
-  static JsonTypeConverter2<ScheduleStatus, String, String> $converterstatus =
-      const EnumNameConverter<ScheduleStatus>(ScheduleStatus.values);
 }
 
 class PostSchedule extends DataClass implements Insertable<PostSchedule> {
@@ -7021,11 +7014,7 @@ class PostSchedule extends DataClass implements Insertable<PostSchedule> {
       scheduledAt,
       PgTypes.timestampWithTimezone,
     );
-    {
-      map['status'] = Variable<String>(
-        $PostSchedulesTable.$converterstatus.toSql(status),
-      );
-    }
+    map['status'] = Variable<ScheduleStatus>(status, scheduleStatusType);
     if (!nullToAbsent || externalPostId != null) {
       map['external_post_id'] = Variable<String>(externalPostId);
     }
@@ -7082,9 +7071,7 @@ class PostSchedule extends DataClass implements Insertable<PostSchedule> {
         json['socialAccountTargetId'],
       ),
       scheduledAt: serializer.fromJson<PgDateTime>(json['scheduledAt']),
-      status: $PostSchedulesTable.$converterstatus.fromJson(
-        serializer.fromJson<String>(json['status']),
-      ),
+      status: serializer.fromJson<ScheduleStatus>(json['status']),
       externalPostId: serializer.fromJson<String?>(json['externalPostId']),
       publishedAt: serializer.fromJson<PgDateTime?>(json['publishedAt']),
       errorMessage: serializer.fromJson<String?>(json['errorMessage']),
@@ -7102,9 +7089,7 @@ class PostSchedule extends DataClass implements Insertable<PostSchedule> {
         socialAccountTargetId,
       ),
       'scheduledAt': serializer.toJson<PgDateTime>(scheduledAt),
-      'status': serializer.toJson<String>(
-        $PostSchedulesTable.$converterstatus.toJson(status),
-      ),
+      'status': serializer.toJson<ScheduleStatus>(status),
       'externalPostId': serializer.toJson<String?>(externalPostId),
       'publishedAt': serializer.toJson<PgDateTime?>(publishedAt),
       'errorMessage': serializer.toJson<String?>(errorMessage),
@@ -7254,7 +7239,7 @@ class PostSchedulesCompanion extends UpdateCompanion<PostSchedule> {
     Expression<UuidValue>? postId,
     Expression<UuidValue>? socialAccountTargetId,
     Expression<PgDateTime>? scheduledAt,
-    Expression<String>? status,
+    Expression<ScheduleStatus>? status,
     Expression<String>? externalPostId,
     Expression<PgDateTime>? publishedAt,
     Expression<String>? errorMessage,
@@ -7329,8 +7314,9 @@ class PostSchedulesCompanion extends UpdateCompanion<PostSchedule> {
       );
     }
     if (status.present) {
-      map['status'] = Variable<String>(
-        $PostSchedulesTable.$converterstatus.toSql(status.value),
+      map['status'] = Variable<ScheduleStatus>(
+        status.value,
+        scheduleStatusType,
       );
     }
     if (externalPostId.present) {
@@ -8696,10 +8682,9 @@ class $$UserIdentitiesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<IdentityProvider, IdentityProvider, String>
-  get provider => $composableBuilder(
+  ColumnFilters<IdentityProvider> get provider => $composableBuilder(
     column: $table.provider,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<String> get providerSubject => $composableBuilder(
@@ -8755,7 +8740,7 @@ class $$UserIdentitiesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get provider => $composableBuilder(
+  ColumnOrderings<IdentityProvider> get provider => $composableBuilder(
     column: $table.provider,
     builder: (column) => ColumnOrderings(column),
   );
@@ -8811,7 +8796,7 @@ class $$UserIdentitiesTableAnnotationComposer
   GeneratedColumn<UuidValue> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<IdentityProvider, String> get provider =>
+  GeneratedColumn<IdentityProvider> get provider =>
       $composableBuilder(column: $table.provider, builder: (column) => column);
 
   GeneratedColumn<String> get providerSubject => $composableBuilder(
@@ -12294,10 +12279,9 @@ class $$MediaFilesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<StorageType, StorageType, String>
-  get storageType => $composableBuilder(
+  ColumnFilters<StorageType> get storageType => $composableBuilder(
     column: $table.storageType,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<String> get storagePath => $composableBuilder(
@@ -12416,7 +12400,7 @@ class $$MediaFilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get storageType => $composableBuilder(
+  ColumnOrderings<StorageType> get storageType => $composableBuilder(
     column: $table.storageType,
     builder: (column) => ColumnOrderings(column),
   );
@@ -12510,11 +12494,10 @@ class $$MediaFilesTableAnnotationComposer
   GeneratedColumn<UuidValue> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<StorageType, String> get storageType =>
-      $composableBuilder(
-        column: $table.storageType,
-        builder: (column) => column,
-      );
+  GeneratedColumn<StorageType> get storageType => $composableBuilder(
+    column: $table.storageType,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get storagePath => $composableBuilder(
     column: $table.storagePath,
@@ -13433,11 +13416,10 @@ class $$PostsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<PostStatus, PostStatus, String> get status =>
-      $composableBuilder(
-        column: $table.status,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnFilters<PostStatus> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<PgDateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
@@ -13597,7 +13579,7 @@ class $$PostsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get status => $composableBuilder(
+  ColumnOrderings<PostStatus> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
   );
@@ -13658,7 +13640,7 @@ class $$PostsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumnWithTypeConverter<PostStatus, String> get status =>
+  GeneratedColumn<PostStatus> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<PgDateTime> get createdAt =>
@@ -15375,10 +15357,9 @@ class $$PostSchedulesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<ScheduleStatus, ScheduleStatus, String>
-  get status => $composableBuilder(
+  ColumnFilters<ScheduleStatus> get status => $composableBuilder(
     column: $table.status,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<String> get externalPostId => $composableBuilder(
@@ -15497,7 +15478,7 @@ class $$PostSchedulesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get status => $composableBuilder(
+  ColumnOrderings<ScheduleStatus> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
   );
@@ -15592,7 +15573,7 @@ class $$PostSchedulesTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumnWithTypeConverter<ScheduleStatus, String> get status =>
+  GeneratedColumn<ScheduleStatus> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<String> get externalPostId => $composableBuilder(
@@ -16369,16 +16350,19 @@ class ArtistsDaoManager {
       $$ArtistsTableTableManager(_db.attachedDatabase, _db.artists);
 }
 
-mixin _$UsersDaoMixin on DatabaseAccessor<PostflowDatabase> {
+mixin _$RefreshTokensDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
-  UsersDaoManager get managers => UsersDaoManager(this);
+  $RefreshTokensTable get refreshTokens => attachedDatabase.refreshTokens;
+  RefreshTokensDaoManager get managers => RefreshTokensDaoManager(this);
 }
 
-class UsersDaoManager {
-  final _$UsersDaoMixin _db;
-  UsersDaoManager(this._db);
+class RefreshTokensDaoManager {
+  final _$RefreshTokensDaoMixin _db;
+  RefreshTokensDaoManager(this._db);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$RefreshTokensTableTableManager get refreshTokens =>
+      $$RefreshTokensTableTableManager(_db.attachedDatabase, _db.refreshTokens);
 }
 
 mixin _$UserIdentitiesDaoMixin on DatabaseAccessor<PostflowDatabase> {
@@ -16399,17 +16383,14 @@ class UserIdentitiesDaoManager {
       );
 }
 
-mixin _$RefreshTokensDaoMixin on DatabaseAccessor<PostflowDatabase> {
+mixin _$UsersDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
-  $RefreshTokensTable get refreshTokens => attachedDatabase.refreshTokens;
-  RefreshTokensDaoManager get managers => RefreshTokensDaoManager(this);
+  UsersDaoManager get managers => UsersDaoManager(this);
 }
 
-class RefreshTokensDaoManager {
-  final _$RefreshTokensDaoMixin _db;
-  RefreshTokensDaoManager(this._db);
+class UsersDaoManager {
+  final _$UsersDaoMixin _db;
+  UsersDaoManager(this._db);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db.attachedDatabase, _db.users);
-  $$RefreshTokensTableTableManager get refreshTokens =>
-      $$RefreshTokensTableTableManager(_db.attachedDatabase, _db.refreshTokens);
 }
