@@ -4,6 +4,8 @@ import 'package:postgres/postgres.dart' as pg;
 
 import '../config/app_config.dart';
 import '../di.dart';
+import '../utils/logger.dart';
+import 'codec/enum_codec.dart';
 import 'tables/artists.dart';
 import 'tables/caption_templates.dart';
 import 'tables/characters.dart';
@@ -28,6 +30,8 @@ part './daos/refresh_tokens_dao.dart';
 part './daos/user_identities_dao.dart';
 part './daos/users_dao.dart';
 part 'database.g.dart';
+
+const _log = Logger('Database');
 
 @DriftDatabase(
   tables: [
@@ -59,20 +63,59 @@ class PostflowDatabase extends _$PostflowDatabase {
   int get schemaVersion => 1;
 
   static QueryExecutor _openConnection() {
-    final config = sl<AppConfig>();
+    return LazyDatabase(
+      () async {
+        final config = sl<AppConfig>();
 
-    return PgDatabase(
-      settings: pg.ConnectionSettings(
-        // because we are always in a container, we can disable SSL
-        sslMode: pg.SslMode.disable,
-      ),
-      endpoint: pg.Endpoint(
-        host: config.dbHost,
-        database: config.dbName,
-        username: config.dbUser,
-        password: config.dbPassword,
-        port: config.dbPort,
-      ),
+        final endpoint = pg.Endpoint(
+          host: config.dbHost,
+          database: config.dbName,
+          username: config.dbUser,
+          password: config.dbPassword,
+          port: config.dbPort,
+        );
+
+        // ALL OF THIS just because postgres doesn't decode enums properly
+        final rawConnection = await pg.Connection.open(
+          endpoint,
+          settings: pg.ConnectionSettings(sslMode: pg.SslMode.disable),
+        );
+        final result = await rawConnection.execute(
+          "SELECT typname, oid::text FROM pg_type WHERE typtype = 'e'",
+        );
+        final enumCodec = EnumTextCodec();
+
+        final Map<int, pg.Codec> codecs = {};
+
+        for (final row in result) {
+          final oid = int.parse(row[1] as String);
+          final name = row[0] as String;
+
+          _log.info('Registering codec for enum $name with OID $oid');
+          codecs[oid] = enumCodec;
+        }
+
+        await rawConnection.close();
+
+        final registry = pg.TypeRegistry(codecs: codecs);
+
+        return PgDatabase(
+          settings: pg.ConnectionSettings(
+            // because we are always in a container, we can disable SSL
+            sslMode: pg.SslMode.disable,
+            typeRegistry: registry,
+          ),
+          endpoint: pg.Endpoint(
+            host: config.dbHost,
+            database: config.dbName,
+            username: config.dbUser,
+            password: config.dbPassword,
+            port: config.dbPort,
+          ),
+        );
+      },
+      dialect: SqlDialect.postgres,
+      openImmediately: true,
     );
   }
 }
