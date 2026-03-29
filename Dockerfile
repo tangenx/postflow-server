@@ -5,11 +5,11 @@ COPY pubspec.* ./
 RUN dart pub get
 
 COPY . .
-RUN dart compile exe bin/server.dart -o bin/server
+RUN dart build cli bin/server.dart
 
 FROM scratch
 COPY --from=build /runtime/ /
-COPY --from=build /app/bin/server /app/bin/
+COPY --from=build /app/build/cli/linux_x64/bundle/ /app/
 
 # Start server.
 EXPOSE 5555
