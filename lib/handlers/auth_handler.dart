@@ -5,6 +5,7 @@ import 'package:shelf/shelf.dart';
 
 import '../config/app_config.dart';
 import '../services/auth_service.dart';
+import '../utils/api_response.dart';
 
 class AuthHandler {
   final AuthService _authService;
@@ -73,8 +74,8 @@ class AuthHandler {
 
     await _authService.logout(refreshToken);
 
-    return Response.ok(
-      'logged out',
+    return ApiResponse.ok(
+      null,
       headers: {
         'set-cookie': ['refresh_token=', 'Max-Age=0', 'Path=/'].join('; '),
       },
@@ -83,13 +84,12 @@ class AuthHandler {
 
   // Helper
   Response _authResponse(AuthData authData) {
-    return Response.ok(
-      jsonEncode({
+    return ApiResponse.ok(
+      {
         'access_token': authData.accessToken,
         'refresh_token': authData.refreshToken,
-      }),
+      },
       headers: {
-        "content-type": "application/json",
         "set-cookie": [
           'refresh_token=${authData.refreshToken}',
           'Max-Age=${_config.jwtRefreshTtl.inSeconds}',
