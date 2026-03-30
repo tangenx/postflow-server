@@ -4,7 +4,10 @@
       "div",
       "details",
       "summary",
-      "ol"
+      "ol",
+      "li",
+      "pre",
+      "b"
     ]
   }
 }

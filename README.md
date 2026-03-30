@@ -33,23 +33,22 @@ client - a desktop app for managing your anime posting workflow.
    <details>
    <summary>Click to expand</summary>
       <ol type="1">
-   1. `status` - get node ID
-   2. `layout assign -z dc1 -c 10G <NODE ID HERE>` - set layout
-   3. `layout apply --version 1` - apply layout
-   4. `bucket create <BUCKET NAME HERE>` - create bucket
-   5. `key create <KEY NAME NAME>` - create API key
-   6. **REMEMBER THE SECRET KEY - YOU CANNOT GET IT AGAIN**
-   7. `bucket allow --read --write <BUCKET NAME HERE> --key <KEY NAME NAME>` - assign API key to bucket
-   8. Add these to your `.env` file:
-
-   ```env
-      S3_ENDPOINT=http://localhost:3900
-      S3_REGION=garage
-      S3_BUCKET=<BUCKET NAME HERE>
-      S3_ACCESS_KEY=<KEY ID HERE>
-      S3_SECRET_KEY=<SECRET KEY HERE>
-   ```
-
+         <li>`status` - get node ID</li>
+         <li>`layout assign -z dc1 -c 10G <NODE ID HERE>` - set layout</li>
+         <li>`layout apply --version 1` - apply layout</li>
+         <li>`bucket create <BUCKET NAME HERE>` - create bucket</li>
+         <li>`key create <KEY NAME NAME>` - create API key</li>
+         <li><b>REMEMBER THE SECRET KEY - YOU CANNOT GET IT AGAIN</b></li>
+         <li>`bucket allow --read --write <BUCKET NAME HERE> --key <KEY NAME NAME>` - assign API key to bucket</li>
+         <li>Add these to your `.env` file:
+            <pre>
+   S3_ENDPOINT=http://localhost:3900
+   S3_REGION=garage
+   S3_BUCKET=BUCKET NAME HERE
+   S3_ACCESS_KEY=KEY ID HERE
+   S3_SECRET_KEY=SECRET KEY HERE
+            </pre>
+         </li>
       </ol>
    </details>
 
