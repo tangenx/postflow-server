@@ -23,12 +23,12 @@ class ArtistsDao extends DatabaseAccessor<PostflowDatabase>
   }
 
   // R
-  /// return artist by name or null
-  Future<Artist?> getByName(String name) {
-    return (select(
-      artists,
-    )..where((t) => t.name.equals(name))).getSingleOrNull();
-  }
+  // return artist by name or null
+  // Future<Artist?> getByName(String name) {
+  //   return (select(
+  //     artists,
+  //   )..where((t) => t.name.equals(name))).getSingleOrNull();
+  // }
 
   Future<Artist?> getById(UuidValue id) {
     return (select(artists)..where((t) => t.id.equals(id))).getSingleOrNull();

@@ -16,12 +16,12 @@ class FranchisesDao extends DatabaseAccessor<PostflowDatabase>
   }
 
   // R
-  /// return franchise by name or null
-  Future<Franchise?> getByName(String name) {
-    return (select(
-      franchises,
-    )..where((t) => t.name.equals(name))).getSingleOrNull();
-  }
+  // return franchise by name or null
+  // Future<Franchise?> getByName(String name) {
+  //   return (select(
+  //     franchises,
+  //   )..where((t) => t.name.equals(name))).getSingleOrNull();
+  // }
 
   Future<Franchise?> getById(UuidValue id) {
     return (select(

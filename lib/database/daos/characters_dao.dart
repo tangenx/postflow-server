@@ -21,12 +21,12 @@ class CharactersDao extends DatabaseAccessor<PostflowDatabase>
   }
 
   // R
-  /// return character by name or null
-  Future<Character?> getByName(String name) {
-    return (select(
-      characters,
-    )..where((t) => t.name.equals(name))).getSingleOrNull();
-  }
+  // return character by name or null
+  // Future<Character?> getByName(String name) {
+  //   return (select(
+  //     characters,
+  //   )..where((t) => t.name.equals(name))).getSingleOrNull();
+  // }
 
   Future<Character?> getById(UuidValue id) {
     return (select(
