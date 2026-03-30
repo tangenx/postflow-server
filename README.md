@@ -29,6 +29,7 @@ client - a desktop app for managing your anime posting workflow.
 6. Remember the alias to your Garage:
    `docker compose -f docker-compose.yml exec s3 /garage`
 7. Run following commands to initialize Garage:
+
    a. `status` - get node ID
    b. `layout assign -z dc1 -c 10G <NODE ID HERE>` - set layout
    c. `layout apply --version 1` - apply layout
