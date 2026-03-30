@@ -3,6 +3,7 @@ import 'package:drift_postgres/drift_postgres.dart';
 import 'package:postgres/postgres.dart' as pg;
 
 import '../config/app_config.dart';
+import '../core/exceptions.dart';
 import '../di.dart';
 import '../utils/logger.dart';
 import 'codec/enum_codec.dart';
@@ -26,6 +27,8 @@ import 'tables/user_social_accounts.dart';
 import 'tables/users.dart';
 
 part './daos/artists_dao.dart';
+part './daos/characters_dao.dart';
+part './daos/franchises_dao.dart';
 part './daos/refresh_tokens_dao.dart';
 part './daos/user_identities_dao.dart';
 part './daos/users_dao.dart';

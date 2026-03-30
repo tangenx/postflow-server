@@ -24,6 +24,13 @@ void registerDependencies() {
   sl.registerSingleton<UserIdentitiesDao>(
     UserIdentitiesDao(sl.get<PostflowDatabase>()),
   );
+  sl.registerSingleton<ArtistsDao>(ArtistsDao(sl.get<PostflowDatabase>()));
+  sl.registerSingleton<CharactersDao>(
+    CharactersDao(sl.get<PostflowDatabase>()),
+  );
+  sl.registerSingleton<FranchisesDao>(
+    FranchisesDao(sl.get<PostflowDatabase>()),
+  );
 
   // services
   sl.registerSingleton<JwtService>(JwtService(sl<AppConfig>()));

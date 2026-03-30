@@ -16350,6 +16350,33 @@ class ArtistsDaoManager {
       $$ArtistsTableTableManager(_db.attachedDatabase, _db.artists);
 }
 
+mixin _$CharactersDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $FranchisesTable get franchises => attachedDatabase.franchises;
+  $CharactersTable get characters => attachedDatabase.characters;
+  CharactersDaoManager get managers => CharactersDaoManager(this);
+}
+
+class CharactersDaoManager {
+  final _$CharactersDaoMixin _db;
+  CharactersDaoManager(this._db);
+  $$FranchisesTableTableManager get franchises =>
+      $$FranchisesTableTableManager(_db.attachedDatabase, _db.franchises);
+  $$CharactersTableTableManager get characters =>
+      $$CharactersTableTableManager(_db.attachedDatabase, _db.characters);
+}
+
+mixin _$FranchisesDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $FranchisesTable get franchises => attachedDatabase.franchises;
+  FranchisesDaoManager get managers => FranchisesDaoManager(this);
+}
+
+class FranchisesDaoManager {
+  final _$FranchisesDaoMixin _db;
+  FranchisesDaoManager(this._db);
+  $$FranchisesTableTableManager get franchises =>
+      $$FranchisesTableTableManager(_db.attachedDatabase, _db.franchises);
+}
+
 mixin _$RefreshTokensDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
   $RefreshTokensTable get refreshTokens => attachedDatabase.refreshTokens;
