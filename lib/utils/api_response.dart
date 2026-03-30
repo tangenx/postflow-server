@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 
 class ApiResponse {
@@ -10,7 +11,7 @@ class ApiResponse {
   }) {
     return Response(
       status,
-      body: jsonEncode({'ok': true, 'data': ?data}),
+      body: jsonEncode({'ok': true, 'data': ?data}, toEncodable: _toEncodable),
       headers: {'content-type': 'application/json', ...?headers},
     );
   }
@@ -21,8 +22,22 @@ class ApiResponse {
       body: jsonEncode({
         'ok': false,
         'error': {'code': code, 'message': message},
-      }),
+      }, toEncodable: _toEncodable),
       headers: {'content-type': 'application/json'},
     );
+  }
+
+  static Object? _toEncodable(Object? value) {
+    if (value is UuidValue) {
+      return value.toString();
+    }
+    if (value is PgDateTime) {
+      return value.toDateTime().toIso8601String();
+    }
+    if (value is DateTime) {
+      return value.toIso8601String();
+    }
+
+    throw UnsupportedError('Cannot convert ${value.runtimeType} to JSON');
   }
 }
