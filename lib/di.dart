@@ -3,7 +3,10 @@ import 'package:get_it/get_it.dart';
 
 import 'config/app_config.dart';
 import 'database/database.dart';
+import 'handlers/artist_handler.dart';
 import 'handlers/auth_handler.dart';
+import 'handlers/character_handler.dart';
+import 'handlers/franchise_handler.dart';
 import 'services/auth_service.dart';
 import 'services/jwt_service.dart';
 
@@ -48,4 +51,7 @@ void registerDependencies() {
   sl.registerSingleton<AuthHandler>(
     AuthHandler(sl<AuthService>(), sl<AppConfig>()),
   );
+  sl.registerSingleton<ArtistHandler>(ArtistHandler(sl<ArtistsDao>()));
+  sl.registerSingleton<CharacterHandler>(CharacterHandler(sl<CharactersDao>()));
+  sl.registerSingleton<FranchiseHandler>(FranchiseHandler(sl<FranchisesDao>()));
 }

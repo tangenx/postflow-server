@@ -1,6 +1,10 @@
+import 'package:postflow_server/routes/reference_routes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import '../handlers/artist_handler.dart';
+import '../handlers/character_handler.dart';
+import '../handlers/franchise_handler.dart';
 import 'auth_routes.dart';
 import '../config/app_config.dart';
 import '../di.dart';
@@ -23,7 +27,14 @@ Handler buildRouter() {
   // router.mount('/api/posts', handler);
   // router.mount('/api/media', handler);
   // router.mount('/api/schedules', handler);
-  // router.mount('/api/', references);
+  router.mount(
+    '/api/',
+    referenceRouter(
+      artistHandler: sl.get<ArtistHandler>(),
+      characterHandler: sl.get<CharacterHandler>(),
+      franchiseHandler: sl.get<FranchiseHandler>(),
+    ).call,
+  );
   router.get('/health', healthHandler);
 
   router.all('/<path|.*>', (Request req) => Response.notFound('Not found'));

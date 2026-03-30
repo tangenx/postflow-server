@@ -13,6 +13,7 @@ class AuthHandler {
 
   AuthHandler(this._authService, this._config);
 
+  /// POST /auth/register
   Future<Response> register(Request request) async {
     final body = await request.readAsString();
     final data = jsonDecode(body);
@@ -26,6 +27,7 @@ class AuthHandler {
     return _authResponse(authData);
   }
 
+  /// POST /auth/login
   Future<Response> login(Request request) async {
     final body = await request.readAsString();
     final data = jsonDecode(body);
@@ -38,6 +40,7 @@ class AuthHandler {
     return _authResponse(authData);
   }
 
+  /// POST /auth/refresh
   Future<Response> refresh(Request request) async {
     final cookie = request.headers['cookie'];
     String? refreshToken = extractCookie(cookie, 'refresh_token');
@@ -57,6 +60,7 @@ class AuthHandler {
     return _authResponse(authData);
   }
 
+  /// POST /auth/logout
   Future<Response> logout(Request request) async {
     final cookie = request.headers['cookie'];
     String? refreshToken = extractCookie(cookie, 'refresh_token');
