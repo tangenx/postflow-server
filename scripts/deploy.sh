@@ -1,12 +1,25 @@
 #!/bin/bash
 
+# 1. Run garage
+# 2. Create key
+# 3. Fill in .env
+# 4. Run all the other scripts
+
 set -e
 
-COMPOSE_FILE=${1:-docker-compose.dev.yml}
+COMPOSE_FILE=${1:-docker-compose.yml}
 BUCKET=${2:-anime-posting}
 KEY_NAME=${3:-backend}
 
-docker compose -f $COMPOSE_FILE up -d
+if [ ! -f .env ]; then
+  cp .env.example .env
+fi
+
+sed -i.bak "s/REPLACE_ME/$(openssl rand -hex 32)/" garage.toml
+
+rm -f garage.toml.bak
+
+docker compose -f $COMPOSE_FILE up -d --build s3
 sleep 3
 
 NODE_ID=$(docker compose -f $COMPOSE_FILE exec s3 /garage status 2>/dev/null \
@@ -36,17 +49,13 @@ SECRET_KEY=$(echo "$KEY_OUTPUT" | awk '/Secret key:/ {print $NF}')
 docker compose -f $COMPOSE_FILE exec s3 /garage bucket allow \
   --read --write $BUCKET --key $KEY_NAME
 
-echo ""
-echo "Garage initialized successfully."
-echo ""
-echo "Add these to your .env/launch.json:"
-echo ""
-echo "  S3_ENDPOINT=http://localhost:3900"
-echo "  S3_REGION=garage"
-echo "  S3_BUCKET=$BUCKET"
-echo "  S3_ACCESS_KEY=$ACCESS_KEY"
-echo "  S3_SECRET_KEY=$SECRET_KEY"
-echo ""
-echo "IMPORTANT: save the secret key now —"
-echo "it will never be shown again"
-echo ""
+sed -i.bak \
+  -e "s/REPLACE_S3_ACCESS_KEY/$ACCESS_KEY/g" \
+  -e "s/REPLACE_S3_SECRET_KEY/$SECRET_KEY/g" \
+  -e "s/REPLACE_PASS/$(openssl rand -hex 16)/g" \
+  -e "s/REPLACE_ME/$(openssl rand -base64 32)/g" \
+  .env
+
+rm -f .env.bak
+
+docker compose -f $COMPOSE_FILE up -d --build
