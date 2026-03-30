@@ -19,6 +19,8 @@ Middleware errorMiddleware() {
         return ApiResponse.error(404, 'NOT_FOUND', e.message);
       } on ValidationException catch (e) {
         return ApiResponse.error(400, 'VALIDATION_ERROR', e.message);
+      } on FormatException catch (e) {
+        return ApiResponse.error(400, 'VALIDATION_ERROR', e.message);
       } catch (e, s) {
         _logger.error('Unhandled error', e, s);
         return ApiResponse.error(500, 'INTERNAL_SERVER_ERROR', e.toString());

@@ -16,6 +16,7 @@ Middleware authMiddleware(AppConfig config, JwtService jwtService) {
         return handler(
           request.change(
             context: {
+              // ok this doesn't need validation
               'user-id': UuidValue.fromString(
                 '00000000-0000-0000-0000-000000000000',
               ),
@@ -37,6 +38,7 @@ Middleware authMiddleware(AppConfig config, JwtService jwtService) {
       }
 
       return handler(
+        // also this doesn't need validation too because it's from the database
         request.change(context: {'user-id': UuidValue.fromString(userId)}),
       );
     };
