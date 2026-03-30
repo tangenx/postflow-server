@@ -35,7 +35,7 @@ class RateLimiter {
 }
 
 class _Bucket {
-  final timestamps = List<DateTime>.empty();
+  final timestamps = List<DateTime>.empty(growable: true);
 }
 
 Middleware rateLimitMiddleware(

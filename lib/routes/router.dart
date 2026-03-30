@@ -1,14 +1,15 @@
-import 'package:postflow_server/routes/auth_routes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import 'auth_routes.dart';
 import '../config/app_config.dart';
 import '../di.dart';
 import '../handlers/auth_handler.dart';
-import '../middlewares/auth_middleware.dart';
 import '../handlers/health.dart';
+import '../middlewares/auth_middleware.dart';
 import '../middlewares/error_middleware.dart';
 import '../middlewares/logging_middleware.dart';
+import '../middlewares/rate_limit_middleware.dart';
 import '../services/jwt_service.dart';
 
 // TODO: require all handler classes
@@ -30,6 +31,22 @@ Handler buildRouter() {
   return Pipeline()
       .addMiddleware(loggingMiddleware())
       .addMiddleware(errorMiddleware())
+      .addMiddleware(
+        rateLimitMiddleware({
+          'api/auth/login': RateLimiter(
+            maxRequests: 10,
+            timeFrame: Duration(minutes: 1),
+          ),
+          'api/auth/refresh': RateLimiter(
+            maxRequests: 30,
+            timeFrame: Duration(minutes: 1),
+          ),
+          'api/auth/register': RateLimiter(
+            maxRequests: 5,
+            timeFrame: Duration(minutes: 1),
+          ),
+        }, RateLimiter(maxRequests: 200, timeFrame: Duration(minutes: 1))),
+      )
       .addMiddleware(authMiddleware(config, jwtService))
       .addHandler(router.call);
 }
