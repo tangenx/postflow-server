@@ -5,7 +5,7 @@ import '../types/pg_enum_type.dart';
 import 'media_types.dart';
 import 'users.dart';
 
-enum StorageType { local, remote }
+enum StorageType { local, remote, s3 }
 
 const storageTypeType = PgEnumType<StorageType>(
   pgTypeName: 'storage_type',
