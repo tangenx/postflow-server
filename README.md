@@ -6,12 +6,16 @@
 
 </div>
 
+This is a server for [Postflow](https://github.com/tangenx/postflow-client)
+client - a desktop app for managing your anime posting workflow.
+
 ## Epic guide for deploy
 
 ### Automatic
 
-1. Run `./scripts/generate-secrets.sh`
-2. Deploy with docker (docker compose up -d --build)
+1. Run `./scripts/deploy.sh` (or `./scripts/dev-deploy.sh` for dev deploy)
+2. For dev deploy - run `dart run bin/server.dart`
+3. Gg
 
 ### Manual
 
@@ -19,4 +23,36 @@
 2. Replace `DB_PASSWORD` with your password
    (or generate a random one with `openssl rand -hex 16`)
 3. Replace `JWT_SECRET` with secret from `openssl rand -hex 32`
-4. Run server with `dart build cli` and run it somewhere in `build` folder
+4. Replace `REPLACE_ME` in `garage.toml` with output
+   from `openssl rand -base64 32`
+5. Start only Garage: `docker compose -f docker-compose.yml up -d --build s3`
+6. Remember the alias to your Garage:
+   `docker compose -f docker-compose.yml exec s3 /garage`
+7. Run following commands to initialize Garage:
+
+   <details>
+   <summary>Click to expand</summary>
+      <ol type="1">
+   1. `status` - get node ID
+   2. `layout assign -z dc1 -c 10G <NODE ID HERE>` - set layout
+   3. `layout apply --version 1` - apply layout
+   4. `bucket create <BUCKET NAME HERE>` - create bucket
+   5. `key create <KEY NAME NAME>` - create API key
+   6. **REMEMBER THE SECRET KEY - YOU CANNOT GET IT AGAIN**
+   7. `bucket allow --read --write <BUCKET NAME HERE> --key <KEY NAME NAME>` - assign API key to bucket
+   8. Add these to your `.env` file:
+
+   ```env
+      S3_ENDPOINT=http://localhost:3900
+      S3_REGION=garage
+      S3_BUCKET=<BUCKET NAME HERE>
+      S3_ACCESS_KEY=<KEY ID HERE>
+      S3_SECRET_KEY=<SECRET KEY HERE>
+   ```
+
+      </ol>
+   </details>
+
+8. Run other services with `docker compose -f docker-compose.yml up -d --build`
+   (or `dart run bin/server.dart` for dev deploy)
+9. Gg
