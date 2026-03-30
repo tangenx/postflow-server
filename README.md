@@ -29,29 +29,23 @@ client - a desktop app for managing your anime posting workflow.
 6. Remember the alias to your Garage:
    `docker compose -f docker-compose.yml exec s3 /garage`
 7. Run following commands to initialize Garage:
+   a. `status` - get node ID
+   b. `layout assign -z dc1 -c 10G <NODE ID HERE>` - set layout
+   c. `layout apply --version 1` - apply layout
+   d. `bucket create <BUCKET NAME HERE>` - create bucket
+   e. `key create <KEY NAME NAME>` - create API key
+   f. <b>REMEMBER THE SECRET KEY - YOU CANNOT GET IT AGAIN</b>
+   g. `bucket allow --read --write <BUCKET NAME HERE> --key <KEY NAME NAME>` - assign API key to bucket
+   h. Add these to your `.env` file:
 
-   <details>
-   <summary>Click to expand</summary>
-      <ol type="1">
-         <li>`status` - get node ID</li>
-         <li>`layout assign -z dc1 -c 10G <NODE ID HERE>` - set layout</li>
-         <li>`layout apply --version 1` - apply layout</li>
-         <li>`bucket create <BUCKET NAME HERE>` - create bucket</li>
-         <li>`key create <KEY NAME NAME>` - create API key</li>
-         <li><b>REMEMBER THE SECRET KEY - YOU CANNOT GET IT AGAIN</b></li>
-         <li>`bucket allow --read --write <BUCKET NAME HERE> --key <KEY NAME NAME>` - assign API key to bucket</li>
-         <li>Add these to your `.env` file:
-            <pre>
+   ```env
    S3_ENDPOINT=http://localhost:3900
    S3_REGION=garage
    S3_BUCKET=BUCKET NAME HERE
    S3_ACCESS_KEY=KEY ID HERE
    S3_SECRET_KEY=SECRET KEY HERE
-            </pre>
-         </li>
-      </ol>
-   </details>
+   ```
 
-8. Run other services with `docker compose -f docker-compose.yml up -d --build`
+8. with `docker compose -f docker-compose.yml up -d --build`
    (or `dart run bin/server.dart` for dev deploy)
 9. Gg
