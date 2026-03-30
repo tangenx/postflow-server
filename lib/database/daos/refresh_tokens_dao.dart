@@ -15,6 +15,7 @@ class RefreshTokensDao extends DatabaseAccessor<PostflowDatabase>
     await into(refreshTokens).insert(refreshToken);
   }
 
+  /// find the VALID (not revoked) refresh token by token hash
   Future<RefreshToken?> findValidByHash(String tokenHash) async {
     final now = const CustomExpression<PgDateTime>('NOW()');
 
@@ -35,6 +36,7 @@ class RefreshTokensDao extends DatabaseAccessor<PostflowDatabase>
     return (delete(refreshTokens)..where((t) => t.id.equals(id))).go();
   }
 
+  /// revoke the refresh token by token hash from the database
   Future<int> revokeByHash(String tokenHash) {
     return (delete(
       refreshTokens,

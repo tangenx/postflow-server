@@ -46,7 +46,7 @@ class AuthService {
       }
     }
 
-    final user = await _usersDao.createUser(username: username, email: email);
+    final user = await _usersDao.create(username: username, email: email);
 
     await _userIdentitiesDao.createLocalUserIdentity(
       userId: user.id,
