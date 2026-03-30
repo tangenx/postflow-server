@@ -16,5 +16,19 @@ services:
       timeout: 5s
       retries: 5
 
+  s3:
+    image: dxflrs/garage:v2.2.0
+    container_name: postflow_s3
+    restart: unless-stopped
+    ports:
+      # S3 API
+      - 3900:3900
+    volumes:
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+      - ./garage.dev.toml:/etc/garage.toml:ro
+
 volumes:
   postflow-db-data:
+  garage-meta:
+  garage-data:
