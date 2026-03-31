@@ -22,6 +22,8 @@ services:
       - internal
 
   s3:
+    profiles:
+      - s3
     image: dxflrs/garage:v2.2.0
     container_name: postflow_s3
     restart: unless-stopped
@@ -52,7 +54,6 @@ services:
       SERVER_PORT: ${SERVER_PORT}
       AUTHENTICATION_ENABLED: ${AUTHENTICATION_ENABLED}
       JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_TTL: ${JWT_ACCESS_TTL}
       JWT_REFRESH_TTL: ${JWT_REFRESH_TTL}
     healthcheck:

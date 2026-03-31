@@ -17,6 +17,8 @@ services:
       retries: 5
 
   s3:
+    profiles:
+      - s3
     image: dxflrs/garage:v2.2.0
     container_name: postflow_s3
     restart: unless-stopped
