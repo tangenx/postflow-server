@@ -5,4 +5,4 @@ const publicRoutes = [
   'api/auth/refresh',
 ];
 
-enum StorageType { local, s3 }
+enum StorageType { local, s3, remote }

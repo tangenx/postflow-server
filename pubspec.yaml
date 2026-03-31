@@ -17,6 +17,8 @@ dependencies:
   dart_jsonwebtoken: ^3.4.0
   bcrypt: ^1.2.0
   crypto: ^3.0.7
+  path: ^1.9.1
+  minio: ^3.5.8
 
 dev_dependencies:
   http: ^1.6.0

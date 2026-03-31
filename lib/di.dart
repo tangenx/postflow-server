@@ -2,6 +2,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:get_it/get_it.dart';
 
 import 'config/app_config.dart';
+import 'core/constants.dart';
 import 'database/database.dart';
 import 'handlers/artist_handler.dart';
 import 'handlers/auth_handler.dart';
@@ -10,6 +11,10 @@ import 'handlers/franchise_handler.dart';
 import 'handlers/user_handler.dart';
 import 'services/auth_service.dart';
 import 'services/jwt_service.dart';
+import 'services/storage/local_storage_service.dart';
+import 'services/storage/remote_storage_service.dart';
+import 'services/storage/s3_storage_service.dart';
+import 'services/storage/storage_service.dart';
 
 final sl = GetIt.instance;
 
@@ -50,6 +55,13 @@ void registerDependencies() {
       refreshTokensDao: sl.get<RefreshTokensDao>(),
       config: sl.get<AppConfig>(),
     ),
+  );
+  sl.registerLazySingleton<StorageService>(
+    () => switch (sl.get<AppConfig>().storageType) {
+      StorageType.local => LocalStorageService(sl.get<AppConfig>()),
+      StorageType.s3 => S3StorageService(sl.get<AppConfig>()),
+      StorageType.remote => RemoteStorageService(),
+    },
   );
 
   // handlers
