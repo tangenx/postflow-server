@@ -125,6 +125,7 @@ CREATE TABLE media_types (
     slug               TEXT    NOT NULL UNIQUE,  -- 'image', 'gif', 'video', …
     display_name       TEXT    NOT NULL,
     allowed_extensions TEXT[]  NOT NULL DEFAULT '{}',
+    mime_types         TEXT[]  NOT NULL DEFAULT '{}',
     max_size_mb        INTEGER NOT NULL DEFAULT 20
 );
 
@@ -267,7 +268,7 @@ INSERT INTO user_identities (user_id, provider) VALUES
     ('00000000-0000-0000-0000-000000000001', 'local');
 
 -- common media types
-INSERT INTO media_types (slug, display_name, allowed_extensions, max_size_mb) VALUES
-    ('image', 'Image',     ARRAY['jpg','jpeg','png','webp'],      20),
-    ('gif',   'GIF',       ARRAY['gif'],                          50),
-    ('video', 'Video',     ARRAY['mp4','webm'],                  200);
+INSERT INTO media_types (slug, display_name, allowed_extensions, mime_types, max_size_mb) VALUES
+    ('image', 'Image', ARRAY['jpg','jpeg','png','webp'], ARRAY['image/jpeg','image/png','image/webp'], 20),
+    ('gif',   'GIF',   ARRAY['gif'],                    ARRAY['image/gif'],                           50),
+    ('video', 'Video', ARRAY['mp4','webm'],              ARRAY['video/mp4','video/webm'],             200);

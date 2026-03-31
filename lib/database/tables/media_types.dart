@@ -9,6 +9,9 @@ class MediaTypes extends Table {
   Column<List<String>> get allowedExtensions => customType(
     PgTypes.textArray,
   ).withDefault(Constant([], PgTypes.textArray))();
+  Column<List<String>> get mimeTypes => customType(
+    PgTypes.textArray,
+  ).withDefault(Constant([], PgTypes.textArray))();
   IntColumn get maxSizeMb => integer().withDefault(const Constant(20))();
 
   @override
