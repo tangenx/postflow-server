@@ -1,5 +1,7 @@
 import 'package:dotenv/dotenv.dart';
 
+import '../core/constants.dart';
+
 class AppConfig {
   final String dbName;
   final String dbHost;
@@ -10,6 +12,13 @@ class AppConfig {
   final String jwtSecret;
   final Duration jwtAccessTtl;
   final Duration jwtRefreshTtl;
+  final StorageType storageType; // local / s3
+  final String? localStoragePath;
+  final String? s3Endpoint;
+  final String? s3Bucket;
+  final String? s3Region;
+  final String? s3AccessKey;
+  final String? s3SecretKey;
 
   const AppConfig({
     required this.dbName,
@@ -21,6 +30,13 @@ class AppConfig {
     required this.jwtSecret,
     required this.jwtAccessTtl,
     required this.jwtRefreshTtl,
+    required this.storageType,
+    this.localStoragePath,
+    this.s3Bucket,
+    this.s3Region,
+    this.s3AccessKey,
+    this.s3SecretKey,
+    this.s3Endpoint,
   });
 
   factory AppConfig.fromEnvironment(DotEnv env) {
@@ -48,6 +64,15 @@ class AppConfig {
       jwtRefreshTtl: Duration(
         days: int.parse(getValue('JWT_REFRESH_TTL', fallback: '604800')),
       ),
+      storageType: StorageType.values.byName(
+        getValue('STORAGE_TYPE', fallback: 'local'),
+      ),
+      localStoragePath: env['LOCAL_STORAGE_PATH'],
+      s3Endpoint: env['S3_ENDPOINT'],
+      s3Bucket: env['S3_BUCKET'],
+      s3Region: env['S3_REGION'],
+      s3AccessKey: env['S3_ACCESS_KEY'],
+      s3SecretKey: env['S3_SECRET_KEY'],
     );
   }
 }
