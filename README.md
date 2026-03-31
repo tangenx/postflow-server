@@ -24,7 +24,7 @@ client - a desktop app for managing your anime posting workflow.
    (or generate a random one with `openssl rand -hex 16`)
 3. Replace `JWT_SECRET` with secret from `openssl rand -hex 32`
 4. Replace `REPLACE_ME` in `garage.toml` with output
-   from `openssl rand -base64 32`
+   from `openssl rand -hex 32`
 5. Start only Garage: `docker compose -f docker-compose.yml up -d --build s3`
 6. Remember the alias to your Garage:
    `docker compose -f docker-compose.yml exec s3 /garage`
