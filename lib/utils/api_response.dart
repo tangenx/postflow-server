@@ -37,6 +37,12 @@ class ApiResponse {
     if (value is DateTime) {
       return value.toIso8601String();
     }
+    if (value is BigInt) {
+      return value.toString();
+    }
+    if (value is Enum) {
+      return value.name;
+    }
 
     throw UnsupportedError('Cannot convert ${value.runtimeType} to JSON');
   }
