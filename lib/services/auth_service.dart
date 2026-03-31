@@ -10,6 +10,7 @@ import 'jwt_service.dart';
 class AuthService {
   final UsersDao _usersDao;
   final UserIdentitiesDao _userIdentitiesDao;
+  final UserSettingsDao _userSettingsDao;
   final RefreshTokensDao _refreshTokensDao;
   final JwtService _jwtService;
   final AppConfig _config;
@@ -18,12 +19,14 @@ class AuthService {
     required UserIdentitiesDao userIdentitiesDao,
     required JwtService jwtService,
     required UsersDao usersDao,
+    required UserSettingsDao userSettingsDao,
     required RefreshTokensDao refreshTokensDao,
     required AppConfig config,
   }) : _refreshTokensDao = refreshTokensDao,
        _usersDao = usersDao,
        _jwtService = jwtService,
        _userIdentitiesDao = userIdentitiesDao,
+       _userSettingsDao = userSettingsDao,
        _config = config;
 
   // registration using username and password
@@ -47,6 +50,7 @@ class AuthService {
     }
 
     final user = await _usersDao.create(username: username, email: email);
+    await _userSettingsDao.create(user.id);
 
     await _userIdentitiesDao.createLocalUserIdentity(
       userId: user.id,
