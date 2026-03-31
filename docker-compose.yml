@@ -44,7 +44,7 @@ services:
     ports:
       - 5555:5555
     depends_on:
-      postflow-db:
+      db:
         condition: service_healthy
     environment:
       DB_HOST: ${DB_HOST}
