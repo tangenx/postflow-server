@@ -4,3 +4,5 @@ const publicRoutes = [
   'api/auth/register',
   'api/auth/refresh',
 ];
+
+enum StorageType { local, s3, remote }
