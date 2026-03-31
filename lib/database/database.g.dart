@@ -17191,6 +17191,24 @@ class FranchisesDaoManager {
       $$FranchisesTableTableManager(_db.attachedDatabase, _db.franchises);
 }
 
+mixin _$MediaDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $MediaTypesTable get mediaTypes => attachedDatabase.mediaTypes;
+  $UsersTable get users => attachedDatabase.users;
+  $MediaFilesTable get mediaFiles => attachedDatabase.mediaFiles;
+  MediaDaoManager get managers => MediaDaoManager(this);
+}
+
+class MediaDaoManager {
+  final _$MediaDaoMixin _db;
+  MediaDaoManager(this._db);
+  $$MediaTypesTableTableManager get mediaTypes =>
+      $$MediaTypesTableTableManager(_db.attachedDatabase, _db.mediaTypes);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$MediaFilesTableTableManager get mediaFiles =>
+      $$MediaFilesTableTableManager(_db.attachedDatabase, _db.mediaFiles);
+}
+
 mixin _$RefreshTokensDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
   $RefreshTokensTable get refreshTokens => attachedDatabase.refreshTokens;

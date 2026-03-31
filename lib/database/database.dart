@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
+import 'package:minio/models.dart';
 import 'package:postgres/postgres.dart' as pg;
 
 import '../config/app_config.dart';
+import '../core/constants.dart';
 import '../core/exceptions.dart';
 import '../di.dart';
 import '../utils/logger.dart';
@@ -30,6 +32,7 @@ import 'tables/users.dart';
 part './daos/artists_dao.dart';
 part './daos/characters_dao.dart';
 part './daos/franchises_dao.dart';
+part './daos/media_dao.dart';
 part './daos/refresh_tokens_dao.dart';
 part './daos/user_settings_dao.dart';
 part './daos/user_identities_dao.dart';

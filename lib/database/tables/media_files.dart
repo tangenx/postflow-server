@@ -1,11 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
 
+import '../../core/constants.dart';
 import '../types/pg_enum_type.dart';
 import 'media_types.dart';
 import 'users.dart';
-
-enum StorageType { local, remote, s3 }
 
 const storageTypeType = PgEnumType<StorageType>(
   pgTypeName: 'storage_type',
