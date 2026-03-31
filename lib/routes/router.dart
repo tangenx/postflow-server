@@ -1,10 +1,12 @@
 import 'package:postflow_server/routes/reference_routes.dart';
+import 'package:postflow_server/routes/user_routes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import '../handlers/artist_handler.dart';
 import '../handlers/character_handler.dart';
 import '../handlers/franchise_handler.dart';
+import '../handlers/user_handler.dart';
 import 'auth_routes.dart';
 import '../config/app_config.dart';
 import '../di.dart';
@@ -24,6 +26,7 @@ Handler buildRouter() {
   final router = Router();
 
   router.mount('/api/auth/', authRouter(sl.get<AuthHandler>()).call);
+  router.mount('/api/user/', userRouter(sl.get<UserHandler>()).call);
   // router.mount('/api/posts', handler);
   // router.mount('/api/media', handler);
   // router.mount('/api/schedules', handler);
