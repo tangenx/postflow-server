@@ -47,6 +47,15 @@ CREATE TABLE refresh_tokens (
 );
 CREATE INDEX ON refresh_tokens (user_id) WHERE revoked_at IS NULL;
 
+-- User settings (such as SauceNAO API key)
+CREATE TABLE user_settings (
+    user_id        UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    saucenao_api_key TEXT,
+    -- other settings here
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 --  SOCIAL NETWORKS
 
 CREATE TABLE social_networks (
@@ -255,6 +264,10 @@ CREATE TRIGGER trg_post_schedules_updated_at
 
 CREATE TRIGGER trg_caption_templates_updated_at
     BEFORE UPDATE ON caption_templates
+    FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
+
+CREATE TRIGGER trg_user_settings_updated_at
+    BEFORE UPDATE ON user_settings
     FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
 --  SEED

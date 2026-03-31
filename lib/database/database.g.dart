@@ -865,6 +865,345 @@ class UserIdentitiesCompanion extends UpdateCompanion<UserIdentity> {
   }
 }
 
+class $UserSettingsTable extends UserSettings
+    with TableInfo<$UserSettingsTable, UserSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<UuidValue> userId = GeneratedColumn<UuidValue>(
+    'user_id',
+    aliasedName,
+    false,
+    type: PgTypes.uuid,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (id)',
+    ),
+  );
+  static const VerificationMeta _saucenaoApiKeyMeta = const VerificationMeta(
+    'saucenaoApiKey',
+  );
+  @override
+  late final GeneratedColumn<String> saucenaoApiKey = GeneratedColumn<String>(
+    'saucenao_api_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<PgDateTime> createdAt =
+      GeneratedColumn<PgDateTime>(
+        'created_at',
+        aliasedName,
+        false,
+        type: PgTypes.timestampWithTimezone,
+        requiredDuringInsert: false,
+        defaultValue: now(),
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<PgDateTime> updatedAt =
+      GeneratedColumn<PgDateTime>(
+        'updated_at',
+        aliasedName,
+        false,
+        type: PgTypes.timestampWithTimezone,
+        requiredDuringInsert: false,
+        defaultValue: now(),
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    userId,
+    saucenaoApiKey,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UserSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('saucenao_api_key')) {
+      context.handle(
+        _saucenaoApiKeyMeta,
+        saucenaoApiKey.isAcceptableOrUnknown(
+          data['saucenao_api_key']!,
+          _saucenaoApiKeyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {userId};
+  @override
+  UserSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserSetting(
+      userId: attachedDatabase.typeMapping.read(
+        PgTypes.uuid,
+        data['${effectivePrefix}user_id'],
+      )!,
+      saucenaoApiKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}saucenao_api_key'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        PgTypes.timestampWithTimezone,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        PgTypes.timestampWithTimezone,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $UserSettingsTable createAlias(String alias) {
+    return $UserSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class UserSetting extends DataClass implements Insertable<UserSetting> {
+  final UuidValue userId;
+  final String? saucenaoApiKey;
+  final PgDateTime createdAt;
+  final PgDateTime updatedAt;
+  const UserSetting({
+    required this.userId,
+    this.saucenaoApiKey,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['user_id'] = Variable<UuidValue>(userId, PgTypes.uuid);
+    if (!nullToAbsent || saucenaoApiKey != null) {
+      map['saucenao_api_key'] = Variable<String>(saucenaoApiKey);
+    }
+    map['created_at'] = Variable<PgDateTime>(
+      createdAt,
+      PgTypes.timestampWithTimezone,
+    );
+    map['updated_at'] = Variable<PgDateTime>(
+      updatedAt,
+      PgTypes.timestampWithTimezone,
+    );
+    return map;
+  }
+
+  UserSettingsCompanion toCompanion(bool nullToAbsent) {
+    return UserSettingsCompanion(
+      userId: Value(userId),
+      saucenaoApiKey: saucenaoApiKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(saucenaoApiKey),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory UserSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserSetting(
+      userId: serializer.fromJson<UuidValue>(json['userId']),
+      saucenaoApiKey: serializer.fromJson<String?>(json['saucenaoApiKey']),
+      createdAt: serializer.fromJson<PgDateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<PgDateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'userId': serializer.toJson<UuidValue>(userId),
+      'saucenaoApiKey': serializer.toJson<String?>(saucenaoApiKey),
+      'createdAt': serializer.toJson<PgDateTime>(createdAt),
+      'updatedAt': serializer.toJson<PgDateTime>(updatedAt),
+    };
+  }
+
+  UserSetting copyWith({
+    UuidValue? userId,
+    Value<String?> saucenaoApiKey = const Value.absent(),
+    PgDateTime? createdAt,
+    PgDateTime? updatedAt,
+  }) => UserSetting(
+    userId: userId ?? this.userId,
+    saucenaoApiKey: saucenaoApiKey.present
+        ? saucenaoApiKey.value
+        : this.saucenaoApiKey,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  UserSetting copyWithCompanion(UserSettingsCompanion data) {
+    return UserSetting(
+      userId: data.userId.present ? data.userId.value : this.userId,
+      saucenaoApiKey: data.saucenaoApiKey.present
+          ? data.saucenaoApiKey.value
+          : this.saucenaoApiKey,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserSetting(')
+          ..write('userId: $userId, ')
+          ..write('saucenaoApiKey: $saucenaoApiKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(userId, saucenaoApiKey, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserSetting &&
+          other.userId == this.userId &&
+          other.saucenaoApiKey == this.saucenaoApiKey &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class UserSettingsCompanion extends UpdateCompanion<UserSetting> {
+  final Value<UuidValue> userId;
+  final Value<String?> saucenaoApiKey;
+  final Value<PgDateTime> createdAt;
+  final Value<PgDateTime> updatedAt;
+  final Value<int> rowid;
+  const UserSettingsCompanion({
+    this.userId = const Value.absent(),
+    this.saucenaoApiKey = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  UserSettingsCompanion.insert({
+    required UuidValue userId,
+    this.saucenaoApiKey = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : userId = Value(userId);
+  static Insertable<UserSetting> custom({
+    Expression<UuidValue>? userId,
+    Expression<String>? saucenaoApiKey,
+    Expression<PgDateTime>? createdAt,
+    Expression<PgDateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (userId != null) 'user_id': userId,
+      if (saucenaoApiKey != null) 'saucenao_api_key': saucenaoApiKey,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  UserSettingsCompanion copyWith({
+    Value<UuidValue>? userId,
+    Value<String?>? saucenaoApiKey,
+    Value<PgDateTime>? createdAt,
+    Value<PgDateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return UserSettingsCompanion(
+      userId: userId ?? this.userId,
+      saucenaoApiKey: saucenaoApiKey ?? this.saucenaoApiKey,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (userId.present) {
+      map['user_id'] = Variable<UuidValue>(userId.value, PgTypes.uuid);
+    }
+    if (saucenaoApiKey.present) {
+      map['saucenao_api_key'] = Variable<String>(saucenaoApiKey.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<PgDateTime>(
+        createdAt.value,
+        PgTypes.timestampWithTimezone,
+      );
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<PgDateTime>(
+        updatedAt.value,
+        PgTypes.timestampWithTimezone,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserSettingsCompanion(')
+          ..write('userId: $userId, ')
+          ..write('saucenaoApiKey: $saucenaoApiKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $RefreshTokensTable extends RefreshTokens
     with TableInfo<$RefreshTokensTable, RefreshToken> {
   @override
@@ -3861,6 +4200,19 @@ class $MediaTypesTable extends MediaTypes
         requiredDuringInsert: false,
         defaultValue: Constant([], PgTypes.textArray),
       );
+  static const VerificationMeta _mimeTypesMeta = const VerificationMeta(
+    'mimeTypes',
+  );
+  @override
+  late final GeneratedColumn<List<String>> mimeTypes =
+      GeneratedColumn<List<String>>(
+        'mime_types',
+        aliasedName,
+        false,
+        type: PgTypes.textArray,
+        requiredDuringInsert: false,
+        defaultValue: Constant([], PgTypes.textArray),
+      );
   static const VerificationMeta _maxSizeMbMeta = const VerificationMeta(
     'maxSizeMb',
   );
@@ -3879,6 +4231,7 @@ class $MediaTypesTable extends MediaTypes
     slug,
     displayName,
     allowedExtensions,
+    mimeTypes,
     maxSizeMb,
   ];
   @override
@@ -3924,6 +4277,12 @@ class $MediaTypesTable extends MediaTypes
         ),
       );
     }
+    if (data.containsKey('mime_types')) {
+      context.handle(
+        _mimeTypesMeta,
+        mimeTypes.isAcceptableOrUnknown(data['mime_types']!, _mimeTypesMeta),
+      );
+    }
     if (data.containsKey('max_size_mb')) {
       context.handle(
         _maxSizeMbMeta,
@@ -3955,6 +4314,10 @@ class $MediaTypesTable extends MediaTypes
         PgTypes.textArray,
         data['${effectivePrefix}allowed_extensions'],
       )!,
+      mimeTypes: attachedDatabase.typeMapping.read(
+        PgTypes.textArray,
+        data['${effectivePrefix}mime_types'],
+      )!,
       maxSizeMb: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}max_size_mb'],
@@ -3973,12 +4336,14 @@ class MediaType extends DataClass implements Insertable<MediaType> {
   final String slug;
   final String displayName;
   final List<String> allowedExtensions;
+  final List<String> mimeTypes;
   final int maxSizeMb;
   const MediaType({
     required this.id,
     required this.slug,
     required this.displayName,
     required this.allowedExtensions,
+    required this.mimeTypes,
     required this.maxSizeMb,
   });
   @override
@@ -3991,6 +4356,7 @@ class MediaType extends DataClass implements Insertable<MediaType> {
       allowedExtensions,
       PgTypes.textArray,
     );
+    map['mime_types'] = Variable<List<String>>(mimeTypes, PgTypes.textArray);
     map['max_size_mb'] = Variable<int>(maxSizeMb);
     return map;
   }
@@ -4001,6 +4367,7 @@ class MediaType extends DataClass implements Insertable<MediaType> {
       slug: Value(slug),
       displayName: Value(displayName),
       allowedExtensions: Value(allowedExtensions),
+      mimeTypes: Value(mimeTypes),
       maxSizeMb: Value(maxSizeMb),
     );
   }
@@ -4017,6 +4384,7 @@ class MediaType extends DataClass implements Insertable<MediaType> {
       allowedExtensions: serializer.fromJson<List<String>>(
         json['allowedExtensions'],
       ),
+      mimeTypes: serializer.fromJson<List<String>>(json['mimeTypes']),
       maxSizeMb: serializer.fromJson<int>(json['maxSizeMb']),
     );
   }
@@ -4028,6 +4396,7 @@ class MediaType extends DataClass implements Insertable<MediaType> {
       'slug': serializer.toJson<String>(slug),
       'displayName': serializer.toJson<String>(displayName),
       'allowedExtensions': serializer.toJson<List<String>>(allowedExtensions),
+      'mimeTypes': serializer.toJson<List<String>>(mimeTypes),
       'maxSizeMb': serializer.toJson<int>(maxSizeMb),
     };
   }
@@ -4037,12 +4406,14 @@ class MediaType extends DataClass implements Insertable<MediaType> {
     String? slug,
     String? displayName,
     List<String>? allowedExtensions,
+    List<String>? mimeTypes,
     int? maxSizeMb,
   }) => MediaType(
     id: id ?? this.id,
     slug: slug ?? this.slug,
     displayName: displayName ?? this.displayName,
     allowedExtensions: allowedExtensions ?? this.allowedExtensions,
+    mimeTypes: mimeTypes ?? this.mimeTypes,
     maxSizeMb: maxSizeMb ?? this.maxSizeMb,
   );
   MediaType copyWithCompanion(MediaTypesCompanion data) {
@@ -4055,6 +4426,7 @@ class MediaType extends DataClass implements Insertable<MediaType> {
       allowedExtensions: data.allowedExtensions.present
           ? data.allowedExtensions.value
           : this.allowedExtensions,
+      mimeTypes: data.mimeTypes.present ? data.mimeTypes.value : this.mimeTypes,
       maxSizeMb: data.maxSizeMb.present ? data.maxSizeMb.value : this.maxSizeMb,
     );
   }
@@ -4066,14 +4438,21 @@ class MediaType extends DataClass implements Insertable<MediaType> {
           ..write('slug: $slug, ')
           ..write('displayName: $displayName, ')
           ..write('allowedExtensions: $allowedExtensions, ')
+          ..write('mimeTypes: $mimeTypes, ')
           ..write('maxSizeMb: $maxSizeMb')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, slug, displayName, allowedExtensions, maxSizeMb);
+  int get hashCode => Object.hash(
+    id,
+    slug,
+    displayName,
+    allowedExtensions,
+    mimeTypes,
+    maxSizeMb,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4082,6 +4461,7 @@ class MediaType extends DataClass implements Insertable<MediaType> {
           other.slug == this.slug &&
           other.displayName == this.displayName &&
           other.allowedExtensions == this.allowedExtensions &&
+          other.mimeTypes == this.mimeTypes &&
           other.maxSizeMb == this.maxSizeMb);
 }
 
@@ -4090,6 +4470,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
   final Value<String> slug;
   final Value<String> displayName;
   final Value<List<String>> allowedExtensions;
+  final Value<List<String>> mimeTypes;
   final Value<int> maxSizeMb;
   final Value<int> rowid;
   const MediaTypesCompanion({
@@ -4097,6 +4478,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
     this.slug = const Value.absent(),
     this.displayName = const Value.absent(),
     this.allowedExtensions = const Value.absent(),
+    this.mimeTypes = const Value.absent(),
     this.maxSizeMb = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -4105,6 +4487,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
     required String slug,
     required String displayName,
     this.allowedExtensions = const Value.absent(),
+    this.mimeTypes = const Value.absent(),
     this.maxSizeMb = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : slug = Value(slug),
@@ -4114,6 +4497,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
     Expression<String>? slug,
     Expression<String>? displayName,
     Expression<List<String>>? allowedExtensions,
+    Expression<List<String>>? mimeTypes,
     Expression<int>? maxSizeMb,
     Expression<int>? rowid,
   }) {
@@ -4122,6 +4506,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
       if (slug != null) 'slug': slug,
       if (displayName != null) 'display_name': displayName,
       if (allowedExtensions != null) 'allowed_extensions': allowedExtensions,
+      if (mimeTypes != null) 'mime_types': mimeTypes,
       if (maxSizeMb != null) 'max_size_mb': maxSizeMb,
       if (rowid != null) 'rowid': rowid,
     });
@@ -4132,6 +4517,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
     Value<String>? slug,
     Value<String>? displayName,
     Value<List<String>>? allowedExtensions,
+    Value<List<String>>? mimeTypes,
     Value<int>? maxSizeMb,
     Value<int>? rowid,
   }) {
@@ -4140,6 +4526,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
       slug: slug ?? this.slug,
       displayName: displayName ?? this.displayName,
       allowedExtensions: allowedExtensions ?? this.allowedExtensions,
+      mimeTypes: mimeTypes ?? this.mimeTypes,
       maxSizeMb: maxSizeMb ?? this.maxSizeMb,
       rowid: rowid ?? this.rowid,
     );
@@ -4163,6 +4550,12 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
         PgTypes.textArray,
       );
     }
+    if (mimeTypes.present) {
+      map['mime_types'] = Variable<List<String>>(
+        mimeTypes.value,
+        PgTypes.textArray,
+      );
+    }
     if (maxSizeMb.present) {
       map['max_size_mb'] = Variable<int>(maxSizeMb.value);
     }
@@ -4179,6 +4572,7 @@ class MediaTypesCompanion extends UpdateCompanion<MediaType> {
           ..write('slug: $slug, ')
           ..write('displayName: $displayName, ')
           ..write('allowedExtensions: $allowedExtensions, ')
+          ..write('mimeTypes: $mimeTypes, ')
           ..write('maxSizeMb: $maxSizeMb, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -7776,6 +8170,7 @@ abstract class _$PostflowDatabase extends GeneratedDatabase {
   $PostflowDatabaseManager get managers => $PostflowDatabaseManager(this);
   late final $UsersTable users = $UsersTable(this);
   late final $UserIdentitiesTable userIdentities = $UserIdentitiesTable(this);
+  late final $UserSettingsTable userSettings = $UserSettingsTable(this);
   late final $RefreshTokensTable refreshTokens = $RefreshTokensTable(this);
   late final $SocialNetworksTable socialNetworks = $SocialNetworksTable(this);
   late final $UserSocialAccountsTable userSocialAccounts =
@@ -7803,6 +8198,7 @@ abstract class _$PostflowDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     users,
     userIdentities,
+    userSettings,
     refreshTokens,
     socialNetworks,
     userSocialAccounts,
@@ -7861,6 +8257,25 @@ final class $$UsersTableReferences
     ).filter((f) => f.userId.id.sqlEquals($_itemColumn<UuidValue>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_userIdentitiesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$UserSettingsTable, List<UserSetting>>
+  _userSettingsRefsTable(_$PostflowDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.userSettings,
+        aliasName: $_aliasNameGenerator(db.users.id, db.userSettings.userId),
+      );
+
+  $$UserSettingsTableProcessedTableManager get userSettingsRefs {
+    final manager = $$UserSettingsTableTableManager(
+      $_db,
+      $_db.userSettings,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<UuidValue>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_userSettingsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -8026,6 +8441,31 @@ class $$UsersTableFilterComposer
           }) => $$UserIdentitiesTableFilterComposer(
             $db: $db,
             $table: $db.userIdentities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> userSettingsRefs(
+    Expression<bool> Function($$UserSettingsTableFilterComposer f) f,
+  ) {
+    final $$UserSettingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.userSettings,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserSettingsTableFilterComposer(
+            $db: $db,
+            $table: $db.userSettings,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8253,6 +8693,31 @@ class $$UsersTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> userSettingsRefs<T extends Object>(
+    Expression<T> Function($$UserSettingsTableAnnotationComposer a) f,
+  ) {
+    final $$UserSettingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.userSettings,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserSettingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.userSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> refreshTokensRefs<T extends Object>(
     Expression<T> Function($$RefreshTokensTableAnnotationComposer a) f,
   ) {
@@ -8395,6 +8860,7 @@ class $$UsersTableTableManager
           User,
           PrefetchHooks Function({
             bool userIdentitiesRefs,
+            bool userSettingsRefs,
             bool refreshTokensRefs,
             bool userSocialAccountsRefs,
             bool mediaFilesRefs,
@@ -8458,6 +8924,7 @@ class $$UsersTableTableManager
           prefetchHooksCallback:
               ({
                 userIdentitiesRefs = false,
+                userSettingsRefs = false,
                 refreshTokensRefs = false,
                 userSocialAccountsRefs = false,
                 mediaFilesRefs = false,
@@ -8468,6 +8935,7 @@ class $$UsersTableTableManager
                   db: db,
                   explicitlyWatchedTables: [
                     if (userIdentitiesRefs) db.userIdentities,
+                    if (userSettingsRefs) db.userSettings,
                     if (refreshTokensRefs) db.refreshTokens,
                     if (userSocialAccountsRefs) db.userSocialAccounts,
                     if (mediaFilesRefs) db.mediaFiles,
@@ -8492,6 +8960,27 @@ class $$UsersTableTableManager
                                 table,
                                 p0,
                               ).userIdentitiesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (userSettingsRefs)
+                        await $_getPrefetchedData<
+                          User,
+                          $UsersTable,
+                          UserSetting
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UsersTableReferences
+                              ._userSettingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).userSettingsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.userId == item.id,
@@ -8613,6 +9102,7 @@ typedef $$UsersTableProcessedTableManager =
       User,
       PrefetchHooks Function({
         bool userIdentitiesRefs,
+        bool userSettingsRefs,
         bool refreshTokensRefs,
         bool userSocialAccountsRefs,
         bool mediaFilesRefs,
@@ -8966,6 +9456,309 @@ typedef $$UserIdentitiesTableProcessedTableManager =
       $$UserIdentitiesTableUpdateCompanionBuilder,
       (UserIdentity, $$UserIdentitiesTableReferences),
       UserIdentity,
+      PrefetchHooks Function({bool userId})
+    >;
+typedef $$UserSettingsTableCreateCompanionBuilder =
+    UserSettingsCompanion Function({
+      required UuidValue userId,
+      Value<String?> saucenaoApiKey,
+      Value<PgDateTime> createdAt,
+      Value<PgDateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$UserSettingsTableUpdateCompanionBuilder =
+    UserSettingsCompanion Function({
+      Value<UuidValue> userId,
+      Value<String?> saucenaoApiKey,
+      Value<PgDateTime> createdAt,
+      Value<PgDateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$UserSettingsTableReferences
+    extends
+        BaseReferences<_$PostflowDatabase, $UserSettingsTable, UserSetting> {
+  $$UserSettingsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsersTable _userIdTable(_$PostflowDatabase db) => db.users
+      .createAlias($_aliasNameGenerator(db.userSettings.userId, db.users.id));
+
+  $$UsersTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<UuidValue>('user_id')!;
+
+    final manager = $$UsersTableTableManager(
+      $_db,
+      $_db.users,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$UserSettingsTableFilterComposer
+    extends Composer<_$PostflowDatabase, $UserSettingsTable> {
+  $$UserSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get saucenaoApiKey => $composableBuilder(
+    column: $table.saucenaoApiKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<PgDateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<PgDateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableFilterComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UserSettingsTableOrderingComposer
+    extends Composer<_$PostflowDatabase, $UserSettingsTable> {
+  $$UserSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get saucenaoApiKey => $composableBuilder(
+    column: $table.saucenaoApiKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<PgDateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<PgDateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UserSettingsTableAnnotationComposer
+    extends Composer<_$PostflowDatabase, $UserSettingsTable> {
+  $$UserSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get saucenaoApiKey => $composableBuilder(
+    column: $table.saucenaoApiKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<PgDateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<PgDateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UserSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$PostflowDatabase,
+          $UserSettingsTable,
+          UserSetting,
+          $$UserSettingsTableFilterComposer,
+          $$UserSettingsTableOrderingComposer,
+          $$UserSettingsTableAnnotationComposer,
+          $$UserSettingsTableCreateCompanionBuilder,
+          $$UserSettingsTableUpdateCompanionBuilder,
+          (UserSetting, $$UserSettingsTableReferences),
+          UserSetting,
+          PrefetchHooks Function({bool userId})
+        > {
+  $$UserSettingsTableTableManager(
+    _$PostflowDatabase db,
+    $UserSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UserSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<UuidValue> userId = const Value.absent(),
+                Value<String?> saucenaoApiKey = const Value.absent(),
+                Value<PgDateTime> createdAt = const Value.absent(),
+                Value<PgDateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserSettingsCompanion(
+                userId: userId,
+                saucenaoApiKey: saucenaoApiKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required UuidValue userId,
+                Value<String?> saucenaoApiKey = const Value.absent(),
+                Value<PgDateTime> createdAt = const Value.absent(),
+                Value<PgDateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserSettingsCompanion.insert(
+                userId: userId,
+                saucenaoApiKey: saucenaoApiKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$UserSettingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable: $$UserSettingsTableReferences
+                                    ._userIdTable(db),
+                                referencedColumn: $$UserSettingsTableReferences
+                                    ._userIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$UserSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$PostflowDatabase,
+      $UserSettingsTable,
+      UserSetting,
+      $$UserSettingsTableFilterComposer,
+      $$UserSettingsTableOrderingComposer,
+      $$UserSettingsTableAnnotationComposer,
+      $$UserSettingsTableCreateCompanionBuilder,
+      $$UserSettingsTableUpdateCompanionBuilder,
+      (UserSetting, $$UserSettingsTableReferences),
+      UserSetting,
       PrefetchHooks Function({bool userId})
     >;
 typedef $$RefreshTokensTableCreateCompanionBuilder =
@@ -11873,6 +12666,7 @@ typedef $$MediaTypesTableCreateCompanionBuilder =
       required String slug,
       required String displayName,
       Value<List<String>> allowedExtensions,
+      Value<List<String>> mimeTypes,
       Value<int> maxSizeMb,
       Value<int> rowid,
     });
@@ -11882,6 +12676,7 @@ typedef $$MediaTypesTableUpdateCompanionBuilder =
       Value<String> slug,
       Value<String> displayName,
       Value<List<String>> allowedExtensions,
+      Value<List<String>> mimeTypes,
       Value<int> maxSizeMb,
       Value<int> rowid,
     });
@@ -11938,6 +12733,11 @@ class $$MediaTypesTableFilterComposer
 
   ColumnFilters<List<String>> get allowedExtensions => $composableBuilder(
     column: $table.allowedExtensions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<List<String>> get mimeTypes => $composableBuilder(
+    column: $table.mimeTypes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12001,6 +12801,11 @@ class $$MediaTypesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<List<String>> get mimeTypes => $composableBuilder(
+    column: $table.mimeTypes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get maxSizeMb => $composableBuilder(
     column: $table.maxSizeMb,
     builder: (column) => ColumnOrderings(column),
@@ -12031,6 +12836,9 @@ class $$MediaTypesTableAnnotationComposer
     column: $table.allowedExtensions,
     builder: (column) => column,
   );
+
+  GeneratedColumn<List<String>> get mimeTypes =>
+      $composableBuilder(column: $table.mimeTypes, builder: (column) => column);
 
   GeneratedColumn<int> get maxSizeMb =>
       $composableBuilder(column: $table.maxSizeMb, builder: (column) => column);
@@ -12093,6 +12901,7 @@ class $$MediaTypesTableTableManager
                 Value<String> slug = const Value.absent(),
                 Value<String> displayName = const Value.absent(),
                 Value<List<String>> allowedExtensions = const Value.absent(),
+                Value<List<String>> mimeTypes = const Value.absent(),
                 Value<int> maxSizeMb = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MediaTypesCompanion(
@@ -12100,6 +12909,7 @@ class $$MediaTypesTableTableManager
                 slug: slug,
                 displayName: displayName,
                 allowedExtensions: allowedExtensions,
+                mimeTypes: mimeTypes,
                 maxSizeMb: maxSizeMb,
                 rowid: rowid,
               ),
@@ -12109,6 +12919,7 @@ class $$MediaTypesTableTableManager
                 required String slug,
                 required String displayName,
                 Value<List<String>> allowedExtensions = const Value.absent(),
+                Value<List<String>> mimeTypes = const Value.absent(),
                 Value<int> maxSizeMb = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MediaTypesCompanion.insert(
@@ -12116,6 +12927,7 @@ class $$MediaTypesTableTableManager
                 slug: slug,
                 displayName: displayName,
                 allowedExtensions: allowedExtensions,
+                mimeTypes: mimeTypes,
                 maxSizeMb: maxSizeMb,
                 rowid: rowid,
               ),
@@ -16304,6 +17116,8 @@ class $PostflowDatabaseManager {
       $$UsersTableTableManager(_db, _db.users);
   $$UserIdentitiesTableTableManager get userIdentities =>
       $$UserIdentitiesTableTableManager(_db, _db.userIdentities);
+  $$UserSettingsTableTableManager get userSettings =>
+      $$UserSettingsTableTableManager(_db, _db.userSettings);
   $$RefreshTokensTableTableManager get refreshTokens =>
       $$RefreshTokensTableTableManager(_db, _db.refreshTokens);
   $$SocialNetworksTableTableManager get socialNetworks =>
@@ -16390,6 +17204,21 @@ class RefreshTokensDaoManager {
       $$UsersTableTableManager(_db.attachedDatabase, _db.users);
   $$RefreshTokensTableTableManager get refreshTokens =>
       $$RefreshTokensTableTableManager(_db.attachedDatabase, _db.refreshTokens);
+}
+
+mixin _$UserSettingsDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $UserSettingsTable get userSettings => attachedDatabase.userSettings;
+  UserSettingsDaoManager get managers => UserSettingsDaoManager(this);
+}
+
+class UserSettingsDaoManager {
+  final _$UserSettingsDaoMixin _db;
+  UserSettingsDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$UserSettingsTableTableManager get userSettings =>
+      $$UserSettingsTableTableManager(_db.attachedDatabase, _db.userSettings);
 }
 
 mixin _$UserIdentitiesDaoMixin on DatabaseAccessor<PostflowDatabase> {

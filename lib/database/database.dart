@@ -23,6 +23,7 @@ import 'tables/refresh_tokens.dart';
 import 'tables/social_account_targets.dart';
 import 'tables/social_networks.dart';
 import 'tables/user_identities.dart';
+import 'tables/user_settings.dart';
 import 'tables/user_social_accounts.dart';
 import 'tables/users.dart';
 
@@ -30,6 +31,7 @@ part './daos/artists_dao.dart';
 part './daos/characters_dao.dart';
 part './daos/franchises_dao.dart';
 part './daos/refresh_tokens_dao.dart';
+part './daos/user_settings_dao.dart';
 part './daos/user_identities_dao.dart';
 part './daos/users_dao.dart';
 part 'database.g.dart';
@@ -40,6 +42,7 @@ const _log = Logger('Database');
   tables: [
     Users,
     UserIdentities,
+    UserSettings,
     RefreshTokens,
     SocialNetworks,
     UserSocialAccounts,
