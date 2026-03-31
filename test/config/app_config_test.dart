@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:test/test.dart';
 import 'package:postflow_server/config/app_config.dart';
+import 'package:postflow_server/core/constants.dart';
 
 /// Creates a [DotEnv] loaded from a temporary file with the given [content].
 DotEnv _envFromContent(String content) {
@@ -35,6 +36,7 @@ void main() {
         jwtSecret: 'secret',
         jwtAccessTtl: Duration(minutes: 15),
         jwtRefreshTtl: Duration(days: 7),
+        storageType: StorageType.local,
       );
 
       expect(config.dbName, 'testdb');
@@ -46,6 +48,13 @@ void main() {
       expect(config.jwtSecret, 'secret');
       expect(config.jwtAccessTtl, Duration(minutes: 15));
       expect(config.jwtRefreshTtl, Duration(days: 7));
+      expect(config.storageType, StorageType.local);
+      expect(config.localStoragePath, isNull);
+      expect(config.s3Endpoint, isNull);
+      expect(config.s3Bucket, isNull);
+      expect(config.s3Region, isNull);
+      expect(config.s3AccessKey, isNull);
+      expect(config.s3SecretKey, isNull);
     });
 
     group('fromEnvironment', () {
@@ -124,6 +133,53 @@ AUTHENTICATION_ENABLED=false
         );
 
         expect(config.authenticationEnabled, isFalse);
+      });
+
+      test('defaults storageType to local with null S3 fields', () {
+        final config = AppConfig.fromEnvironment(_envFromContent(_baseEnv));
+
+        expect(config.storageType, StorageType.local);
+        expect(config.localStoragePath, isNull);
+        expect(config.s3Endpoint, isNull);
+        expect(config.s3Bucket, isNull);
+        expect(config.s3Region, isNull);
+        expect(config.s3AccessKey, isNull);
+        expect(config.s3SecretKey, isNull);
+      });
+
+      test('parses s3 storageType and S3 fields', () {
+        final config = AppConfig.fromEnvironment(
+          _envFromContent('''
+$_baseEnv
+STORAGE_TYPE=s3
+S3_ENDPOINT=http://localhost:3900
+S3_BUCKET=mybucket
+S3_REGION=garage
+S3_ACCESS_KEY=ak
+S3_SECRET_KEY=sk
+LOCAL_STORAGE_PATH=/tmp/uploads
+'''),
+        );
+
+        expect(config.storageType, StorageType.s3);
+        expect(config.s3Endpoint, 'http://localhost:3900');
+        expect(config.s3Bucket, 'mybucket');
+        expect(config.s3Region, 'garage');
+        expect(config.s3AccessKey, 'ak');
+        expect(config.s3SecretKey, 'sk');
+        expect(config.localStoragePath, '/tmp/uploads');
+      });
+
+      test('throws on invalid STORAGE_TYPE', () {
+        expect(
+          () => AppConfig.fromEnvironment(
+            _envFromContent('''
+$_baseEnv
+STORAGE_TYPE=invalid
+'''),
+          ),
+          throwsA(isA<ArgumentError>()),
+        );
       });
     });
   });
