@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 
 import '../database/database.dart';
 import '../utils/api_response.dart';
+import '../utils/request_validation.dart';
 
 class CharacterHandler {
   final CharactersDao _charactersDao;
@@ -15,8 +14,12 @@ class CharacterHandler {
   /// if q == null, return latest 1000 characters
   Future<Response> search(Request request) async {
     final query = request.url.queryParameters['q'];
-    final limit =
-        int.tryParse(request.url.queryParameters['limit'] ?? '10') ?? 10;
+    final limit = RequestValidation.optionalPositiveInt(
+      request.url.queryParameters,
+      'limit',
+      fallback: 10,
+      max: 1000,
+    );
 
     final result = query == null
         ? await _charactersDao.getLatest()
@@ -41,13 +44,31 @@ class CharacterHandler {
 
   /// POST /characters
   Future<Response> create(Request request) async {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final franchiseIdRaw = RequestValidation.requiredString(
+      data,
+      'franchise_id',
+      minLength: 1,
+      maxLength: 64,
+    );
+    final name = RequestValidation.requiredString(
+      data,
+      'name',
+      minLength: 1,
+      maxLength: 255,
+    );
+    final description = RequestValidation.optionalString(
+      data,
+      'description',
+      maxLength: 4000,
+    );
 
     final character = await _charactersDao.create(
-      franchiseId: UuidValue.withValidation(data['franchise_id']),
-      name: data['name'],
-      description: data['description'],
+      franchiseId: UuidValue.withValidation(franchiseIdRaw),
+      name: name,
+      description: description,
     );
 
     return ApiResponse.ok(character.toJson());
@@ -56,16 +77,28 @@ class CharacterHandler {
   /// PUT /characters/:id
   Future<Response> update(Request request, String id) async {
     final characterId = UuidValue.withValidation(id);
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final franchiseIdRaw = RequestValidation.optionalString(
+      data,
+      'franchise_id',
+      maxLength: 64,
+    );
+    final name = RequestValidation.optionalString(data, 'name', maxLength: 255);
+    final description = RequestValidation.optionalString(
+      data,
+      'description',
+      maxLength: 4000,
+    );
 
     final character = await _charactersDao.updateCharacter(
       id: characterId,
-      franchiseId: data['franchise_id'] == null
+      franchiseId: franchiseIdRaw == null
           ? null
-          : UuidValue.withValidation(data['franchise_id']),
-      name: data['name'],
-      description: data['description'],
+          : UuidValue.withValidation(franchiseIdRaw),
+      name: name,
+      description: description,
     );
 
     return ApiResponse.ok(character.toJson());

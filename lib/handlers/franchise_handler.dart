@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 
 import '../database/database.dart';
 import '../utils/api_response.dart';
+import '../utils/request_validation.dart';
 
 class FranchiseHandler {
   final FranchisesDao _franchisesDao;
@@ -15,8 +14,12 @@ class FranchiseHandler {
   /// if q == null, return latest 1000 franchises
   Future<Response> search(Request request) async {
     final query = request.url.queryParameters['q'];
-    final limit =
-        int.tryParse(request.url.queryParameters['limit'] ?? '10') ?? 10;
+    final limit = RequestValidation.optionalPositiveInt(
+      request.url.queryParameters,
+      'limit',
+      fallback: 10,
+      max: 1000,
+    );
 
     final result = query == null
         ? await _franchisesDao.getLatest()
@@ -41,12 +44,24 @@ class FranchiseHandler {
 
   /// POST /franchises
   Future<Response> create(Request request) async {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final name = RequestValidation.requiredString(
+      data,
+      'name',
+      minLength: 1,
+      maxLength: 255,
+    );
+    final description = RequestValidation.optionalString(
+      data,
+      'description',
+      maxLength: 4000,
+    );
 
     final franchise = await _franchisesDao.create(
-      name: data['name'],
-      description: data['description'],
+      name: name,
+      description: description,
     );
 
     return ApiResponse.ok(franchise.toJson());
@@ -55,13 +70,20 @@ class FranchiseHandler {
   /// PUT /franchises/:id
   Future<Response> update(Request request, String id) async {
     final franchiseId = UuidValue.withValidation(id);
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final name = RequestValidation.optionalString(data, 'name', maxLength: 255);
+    final description = RequestValidation.optionalString(
+      data,
+      'description',
+      maxLength: 4000,
+    );
 
     final franchise = await _franchisesDao.updateFranchise(
       id: franchiseId,
-      name: data['name'],
-      description: data['description'],
+      name: name,
+      description: description,
     );
 
     return ApiResponse.ok(franchise.toJson());

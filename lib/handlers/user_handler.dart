@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 
 import '../core/exceptions.dart';
 import '../database/database.dart';
 import '../utils/api_response.dart';
+import '../utils/request_validation.dart';
 
 class UserHandler {
   final UserSettingsDao _userSettingsDao;
@@ -25,8 +24,14 @@ class UserHandler {
   /// PUT /user
   Future<Response> updateSettings(Request request) async {
     final userId = _requireUserId(request);
-    final body = await request.readAsString();
-    final data = jsonDecode(body) as Map<String, dynamic>;
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final saucenaoApiKey = RequestValidation.optionalString(
+      data,
+      'saucenao_api_key',
+      maxLength: 512,
+    );
 
     final existing = await _userSettingsDao.getByUserId(userId);
     if (existing == null) {
@@ -35,7 +40,7 @@ class UserHandler {
 
     final updated = await _userSettingsDao.updateSettings(
       userId: userId,
-      saucenaoApiKey: data['saucenao_api_key'] as String?,
+      saucenaoApiKey: saucenaoApiKey,
     );
 
     return ApiResponse.ok(updated.toJson());

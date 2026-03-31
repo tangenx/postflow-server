@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 
 import '../database/database.dart';
 import '../utils/api_response.dart';
+import '../utils/request_validation.dart';
 
 class ArtistHandler {
   final ArtistsDao _artistsDao;
@@ -15,8 +14,12 @@ class ArtistHandler {
   /// if q == null, return latest 1000 artists
   Future<Response> search(Request request) async {
     final query = request.url.queryParameters['q'];
-    final limit =
-        int.tryParse(request.url.queryParameters['limit'] ?? '10') ?? 10;
+    final limit = RequestValidation.optionalPositiveInt(
+      request.url.queryParameters,
+      'limit',
+      fallback: 10,
+      max: 1000,
+    );
 
     final result = query == null
         ? await _artistsDao.getLatest()
@@ -39,13 +42,30 @@ class ArtistHandler {
 
   /// POST /artists
   Future<Response> create(Request request) async {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final name = RequestValidation.requiredString(
+      data,
+      'name',
+      minLength: 1,
+      maxLength: 255,
+    );
+    final sourceUrl = RequestValidation.optionalString(
+      data,
+      'source_url',
+      maxLength: 2048,
+    );
+    final notes = RequestValidation.optionalString(
+      data,
+      'notes',
+      maxLength: 4000,
+    );
 
     final artist = await _artistsDao.create(
-      name: data['name'],
-      sourceUrl: data['source_url'],
-      notes: data['notes'],
+      name: name,
+      sourceUrl: sourceUrl,
+      notes: notes,
     );
 
     return ApiResponse.ok(artist.toJson());
@@ -54,14 +74,26 @@ class ArtistHandler {
   /// PUT /artists/:id
   Future<Response> update(Request request, String id) async {
     final artistId = UuidValue.withValidation(id);
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final name = RequestValidation.optionalString(data, 'name', maxLength: 255);
+    final sourceUrl = RequestValidation.optionalString(
+      data,
+      'source_url',
+      maxLength: 2048,
+    );
+    final notes = RequestValidation.optionalString(
+      data,
+      'notes',
+      maxLength: 4000,
+    );
 
     final artist = await _artistsDao.updateArtist(
       id: artistId,
-      name: data['name'],
-      sourceUrl: data['source_url'],
-      notes: data['notes'],
+      name: name,
+      sourceUrl: sourceUrl,
+      notes: notes,
     );
 
     return ApiResponse.ok(artist.toJson());

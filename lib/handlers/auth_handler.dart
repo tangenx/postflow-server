@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:postflow_server/utils/extract_cookie.dart';
 import 'package:shelf/shelf.dart';
 
 import '../config/app_config.dart';
 import '../services/auth_service.dart';
 import '../utils/api_response.dart';
+import '../utils/request_validation.dart';
 
 class AuthHandler {
   final AuthService _authService;
@@ -15,13 +14,31 @@ class AuthHandler {
 
   /// POST /auth/register
   Future<Response> register(Request request) async {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
+    );
+    final username = RequestValidation.requiredString(
+      data,
+      'username',
+      minLength: 3,
+      maxLength: 64,
+    );
+    final password = RequestValidation.requiredString(
+      data,
+      'password',
+      minLength: 8,
+      maxLength: 256,
+    );
+    final email = RequestValidation.optionalString(
+      data,
+      'email',
+      maxLength: 320,
+    );
 
     final authData = await _authService.register(
-      data['username'],
-      data['password'],
-      email: data['email'],
+      username,
+      password,
+      email: email,
     );
 
     return _authResponse(authData);
@@ -29,13 +46,23 @@ class AuthHandler {
 
   /// POST /auth/login
   Future<Response> login(Request request) async {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
-
-    final authData = await _authService.login(
-      data['username'],
-      data['password'],
+    final data = RequestValidation.parseJsonObject(
+      await request.readAsString(),
     );
+    final username = RequestValidation.requiredString(
+      data,
+      'username',
+      minLength: 3,
+      maxLength: 64,
+    );
+    final password = RequestValidation.requiredString(
+      data,
+      'password',
+      minLength: 8,
+      maxLength: 256,
+    );
+
+    final authData = await _authService.login(username, password);
 
     return _authResponse(authData);
   }
@@ -46,10 +73,10 @@ class AuthHandler {
     String? refreshToken = extractCookie(cookie, 'refresh_token');
 
     if (refreshToken == null) {
-      final body = await request.readAsString();
-      final data = jsonDecode(body);
-
-      refreshToken = data['refresh_token'];
+      final data = RequestValidation.parseJsonObject(
+        await request.readAsString(),
+      );
+      refreshToken = RequestValidation.optionalString(data, 'refresh_token');
     }
 
     if (refreshToken == null) {
@@ -66,10 +93,10 @@ class AuthHandler {
     String? refreshToken = extractCookie(cookie, 'refresh_token');
 
     if (refreshToken == null) {
-      final body = await request.readAsString();
-      final data = jsonDecode(body);
-
-      refreshToken = data['refresh_token'];
+      final data = RequestValidation.parseJsonObject(
+        await request.readAsString(),
+      );
+      refreshToken = RequestValidation.optionalString(data, 'refresh_token');
     }
 
     if (refreshToken == null) {
