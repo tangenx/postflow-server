@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
-import 'package:minio/models.dart';
 import 'package:postgres/postgres.dart' as pg;
 
 import '../config/app_config.dart';
