@@ -7,6 +7,7 @@ import 'handlers/artist_handler.dart';
 import 'handlers/auth_handler.dart';
 import 'handlers/character_handler.dart';
 import 'handlers/franchise_handler.dart';
+import 'handlers/user_handler.dart';
 import 'services/auth_service.dart';
 import 'services/jwt_service.dart';
 
@@ -27,6 +28,9 @@ void registerDependencies() {
   sl.registerSingleton<UserIdentitiesDao>(
     UserIdentitiesDao(sl.get<PostflowDatabase>()),
   );
+  sl.registerSingleton<UserSettingsDao>(
+    UserSettingsDao(sl.get<PostflowDatabase>()),
+  );
   sl.registerSingleton<ArtistsDao>(ArtistsDao(sl.get<PostflowDatabase>()));
   sl.registerSingleton<CharactersDao>(
     CharactersDao(sl.get<PostflowDatabase>()),
@@ -36,22 +40,28 @@ void registerDependencies() {
   );
 
   // services
-  sl.registerSingleton<JwtService>(JwtService(sl<AppConfig>()));
+  sl.registerSingleton<JwtService>(JwtService(sl.get<AppConfig>()));
   sl.registerSingleton<AuthService>(
     AuthService(
-      userIdentitiesDao: sl<UserIdentitiesDao>(),
-      jwtService: sl<JwtService>(),
-      usersDao: sl<UsersDao>(),
-      refreshTokensDao: sl<RefreshTokensDao>(),
-      config: sl<AppConfig>(),
+      userIdentitiesDao: sl.get<UserIdentitiesDao>(),
+      jwtService: sl.get<JwtService>(),
+      usersDao: sl.get<UsersDao>(),
+      userSettingsDao: sl.get<UserSettingsDao>(),
+      refreshTokensDao: sl.get<RefreshTokensDao>(),
+      config: sl.get<AppConfig>(),
     ),
   );
 
   // handlers
   sl.registerSingleton<AuthHandler>(
-    AuthHandler(sl<AuthService>(), sl<AppConfig>()),
+    AuthHandler(sl.get<AuthService>(), sl.get<AppConfig>()),
   );
-  sl.registerSingleton<ArtistHandler>(ArtistHandler(sl<ArtistsDao>()));
-  sl.registerSingleton<CharacterHandler>(CharacterHandler(sl<CharactersDao>()));
-  sl.registerSingleton<FranchiseHandler>(FranchiseHandler(sl<FranchisesDao>()));
+  sl.registerSingleton<ArtistHandler>(ArtistHandler(sl.get<ArtistsDao>()));
+  sl.registerSingleton<CharacterHandler>(
+    CharacterHandler(sl.get<CharactersDao>()),
+  );
+  sl.registerSingleton<FranchiseHandler>(
+    FranchiseHandler(sl.get<FranchisesDao>()),
+  );
+  sl.registerSingleton<UserHandler>(UserHandler(sl.get<UserSettingsDao>()));
 }
