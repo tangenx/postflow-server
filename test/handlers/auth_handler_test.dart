@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 import 'package:postflow_server/config/app_config.dart';
+import 'package:postflow_server/core/constants.dart';
 import 'package:postflow_server/handlers/auth_handler.dart';
 import 'package:postflow_server/services/auth_service.dart';
 
@@ -73,6 +74,7 @@ void main() {
       jwtSecret: 'test-secret-key-for-jwt-testing-purposes',
       jwtAccessTtl: Duration(minutes: 15),
       jwtRefreshTtl: Duration(days: 7),
+      storageType: StorageType.local,
     );
     fakeAuth = FakeAuthService(testAuthData);
     handler = AuthHandler(fakeAuth, config);

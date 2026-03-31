@@ -183,17 +183,16 @@ void main() {
         expect((body['data'] as List).length, equals(1));
       });
 
-      test('defaults limit to 10 when invalid', () async {
+      test('throws on invalid limit', () async {
         final request = Request(
           'GET',
           Uri.parse('http://localhost/franchises?q=o&limit=abc'),
         );
 
-        final response = await handler.search(request);
-
-        final body = jsonDecode(await response.readAsString());
-        // Both match 'o', limit defaults to 10
-        expect((body['data'] as List).length, equals(2));
+        expect(
+          () => handler.search(request),
+          throwsA(isA<ValidationException>()),
+        );
       });
 
       test('returns empty list when nothing matches', () async {

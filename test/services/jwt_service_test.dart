@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:test/test.dart';
 import 'package:postflow_server/config/app_config.dart';
+import 'package:postflow_server/core/constants.dart';
 import 'package:postflow_server/services/jwt_service.dart';
 
 AppConfig _testConfig({
@@ -18,6 +19,7 @@ AppConfig _testConfig({
     jwtSecret: jwtSecret,
     jwtAccessTtl: accessTtl,
     jwtRefreshTtl: const Duration(days: 7),
+    storageType: StorageType.local,
   );
 }
 

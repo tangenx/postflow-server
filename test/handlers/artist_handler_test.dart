@@ -188,18 +188,16 @@ void main() {
         expect((body['data'] as List).length, equals(1));
       });
 
-      test('defaults limit to 10 when invalid', () async {
+      test('throws on invalid limit', () async {
         final request = Request(
           'GET',
           Uri.parse('http://localhost/artists?q=i&limit=abc'),
         );
 
-        final response = await handler.search(request);
-
-        expect(response.statusCode, equals(200));
-        final body = jsonDecode(await response.readAsString());
-        // Only "Alice" matches 'i', limit defaults to 10 — both would fit
-        expect((body['data'] as List).length, equals(1));
+        expect(
+          () => handler.search(request),
+          throwsA(isA<ValidationException>()),
+        );
       });
 
       test('returns empty list when nothing matches', () async {

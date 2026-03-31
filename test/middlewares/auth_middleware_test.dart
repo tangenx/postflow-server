@@ -2,6 +2,7 @@ import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 import 'package:postflow_server/config/app_config.dart';
+import 'package:postflow_server/core/constants.dart';
 import 'package:postflow_server/middlewares/auth_middleware.dart';
 import 'package:postflow_server/services/jwt_service.dart';
 
@@ -16,6 +17,7 @@ AppConfig _testConfig({bool authEnabled = true}) {
     jwtSecret: 'test-secret-key-for-jwt-testing-purposes',
     jwtAccessTtl: const Duration(minutes: 15),
     jwtRefreshTtl: const Duration(days: 7),
+    storageType: StorageType.local,
   );
 }
 
