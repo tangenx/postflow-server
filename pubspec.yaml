@@ -20,6 +20,7 @@ dependencies:
   path: ^1.9.1
   minio: ^3.5.8
   mime: ^2.0.0
+  collection: ^1.19.1
 
 dev_dependencies:
   http: ^1.6.0

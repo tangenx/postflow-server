@@ -32,6 +32,7 @@ part './daos/artists_dao.dart';
 part './daos/characters_dao.dart';
 part './daos/franchises_dao.dart';
 part './daos/media_dao.dart';
+part './daos/posts_dao.dart';
 part './daos/refresh_tokens_dao.dart';
 part './daos/user_settings_dao.dart';
 part './daos/user_identities_dao.dart';

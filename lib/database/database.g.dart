@@ -17209,6 +17209,48 @@ class MediaDaoManager {
       $$MediaFilesTableTableManager(_db.attachedDatabase, _db.mediaFiles);
 }
 
+mixin _$PostsDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $PostsTable get posts => attachedDatabase.posts;
+  $MediaTypesTable get mediaTypes => attachedDatabase.mediaTypes;
+  $MediaFilesTable get mediaFiles => attachedDatabase.mediaFiles;
+  $PostMediaTable get postMedia => attachedDatabase.postMedia;
+  $ArtistsTable get artists => attachedDatabase.artists;
+  $PostArtistsTable get postArtists => attachedDatabase.postArtists;
+  $FranchisesTable get franchises => attachedDatabase.franchises;
+  $CharactersTable get characters => attachedDatabase.characters;
+  $PostCharactersTable get postCharacters => attachedDatabase.postCharacters;
+  PostsDaoManager get managers => PostsDaoManager(this);
+}
+
+class PostsDaoManager {
+  final _$PostsDaoMixin _db;
+  PostsDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$PostsTableTableManager get posts =>
+      $$PostsTableTableManager(_db.attachedDatabase, _db.posts);
+  $$MediaTypesTableTableManager get mediaTypes =>
+      $$MediaTypesTableTableManager(_db.attachedDatabase, _db.mediaTypes);
+  $$MediaFilesTableTableManager get mediaFiles =>
+      $$MediaFilesTableTableManager(_db.attachedDatabase, _db.mediaFiles);
+  $$PostMediaTableTableManager get postMedia =>
+      $$PostMediaTableTableManager(_db.attachedDatabase, _db.postMedia);
+  $$ArtistsTableTableManager get artists =>
+      $$ArtistsTableTableManager(_db.attachedDatabase, _db.artists);
+  $$PostArtistsTableTableManager get postArtists =>
+      $$PostArtistsTableTableManager(_db.attachedDatabase, _db.postArtists);
+  $$FranchisesTableTableManager get franchises =>
+      $$FranchisesTableTableManager(_db.attachedDatabase, _db.franchises);
+  $$CharactersTableTableManager get characters =>
+      $$CharactersTableTableManager(_db.attachedDatabase, _db.characters);
+  $$PostCharactersTableTableManager get postCharacters =>
+      $$PostCharactersTableTableManager(
+        _db.attachedDatabase,
+        _db.postCharacters,
+      );
+}
+
 mixin _$RefreshTokensDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
   $RefreshTokensTable get refreshTokens => attachedDatabase.refreshTokens;
