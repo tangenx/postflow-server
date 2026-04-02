@@ -209,6 +209,13 @@ CREATE TABLE post_characters (
     PRIMARY KEY (post_id, character_id)
 );
 
+-- Many-to-many: post ↔ franchise
+CREATE TABLE post_franchises (
+    post_id      UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    franchise_id UUID NOT NULL REFERENCES franchises(id) ON DELETE RESTRICT,
+    PRIMARY KEY (post_id, franchise_id)
+);
+
 --  SCHEDULING
 
 CREATE TABLE post_schedules (

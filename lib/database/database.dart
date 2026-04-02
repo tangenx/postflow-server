@@ -18,6 +18,7 @@ import 'tables/media_types.dart';
 import 'tables/post_artists.dart';
 import 'tables/post_captions.dart';
 import 'tables/post_characters.dart';
+import 'tables/post_franchises.dart';
 import 'tables/post_media.dart';
 import 'tables/post_schedules.dart';
 import 'tables/posts.dart';
@@ -62,6 +63,7 @@ const _log = Logger('Database');
     PostMedia,
     PostArtists,
     PostCharacters,
+    PostFranchises,
     PostSchedules,
     PostCaptions,
   ],
