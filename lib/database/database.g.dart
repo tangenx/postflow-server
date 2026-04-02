@@ -3792,9 +3792,9 @@ class $CharactersTable extends Characters
       GeneratedColumn<UuidValue>(
         'franchise_id',
         aliasedName,
-        false,
+        true,
         type: PgTypes.uuid,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
         defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES franchises (id)',
         ),
@@ -3863,8 +3863,6 @@ class $CharactersTable extends Characters
           _franchiseIdMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_franchiseIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -3905,7 +3903,7 @@ class $CharactersTable extends Characters
       franchiseId: attachedDatabase.typeMapping.read(
         PgTypes.uuid,
         data['${effectivePrefix}franchise_id'],
-      )!,
+      ),
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}name'],
@@ -3929,13 +3927,13 @@ class $CharactersTable extends Characters
 
 class Character extends DataClass implements Insertable<Character> {
   final UuidValue id;
-  final UuidValue franchiseId;
+  final UuidValue? franchiseId;
   final String name;
   final String? description;
   final PgDateTime createdAt;
   const Character({
     required this.id,
-    required this.franchiseId,
+    this.franchiseId,
     required this.name,
     this.description,
     required this.createdAt,
@@ -3944,7 +3942,9 @@ class Character extends DataClass implements Insertable<Character> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<UuidValue>(id, PgTypes.uuid);
-    map['franchise_id'] = Variable<UuidValue>(franchiseId, PgTypes.uuid);
+    if (!nullToAbsent || franchiseId != null) {
+      map['franchise_id'] = Variable<UuidValue>(franchiseId, PgTypes.uuid);
+    }
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
@@ -3959,7 +3959,9 @@ class Character extends DataClass implements Insertable<Character> {
   CharactersCompanion toCompanion(bool nullToAbsent) {
     return CharactersCompanion(
       id: Value(id),
-      franchiseId: Value(franchiseId),
+      franchiseId: franchiseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(franchiseId),
       name: Value(name),
       description: description == null && nullToAbsent
           ? const Value.absent()
@@ -3975,7 +3977,7 @@ class Character extends DataClass implements Insertable<Character> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Character(
       id: serializer.fromJson<UuidValue>(json['id']),
-      franchiseId: serializer.fromJson<UuidValue>(json['franchiseId']),
+      franchiseId: serializer.fromJson<UuidValue?>(json['franchiseId']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       createdAt: serializer.fromJson<PgDateTime>(json['createdAt']),
@@ -3986,7 +3988,7 @@ class Character extends DataClass implements Insertable<Character> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<UuidValue>(id),
-      'franchiseId': serializer.toJson<UuidValue>(franchiseId),
+      'franchiseId': serializer.toJson<UuidValue?>(franchiseId),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
       'createdAt': serializer.toJson<PgDateTime>(createdAt),
@@ -3995,13 +3997,13 @@ class Character extends DataClass implements Insertable<Character> {
 
   Character copyWith({
     UuidValue? id,
-    UuidValue? franchiseId,
+    Value<UuidValue?> franchiseId = const Value.absent(),
     String? name,
     Value<String?> description = const Value.absent(),
     PgDateTime? createdAt,
   }) => Character(
     id: id ?? this.id,
-    franchiseId: franchiseId ?? this.franchiseId,
+    franchiseId: franchiseId.present ? franchiseId.value : this.franchiseId,
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
     createdAt: createdAt ?? this.createdAt,
@@ -4048,7 +4050,7 @@ class Character extends DataClass implements Insertable<Character> {
 
 class CharactersCompanion extends UpdateCompanion<Character> {
   final Value<UuidValue> id;
-  final Value<UuidValue> franchiseId;
+  final Value<UuidValue?> franchiseId;
   final Value<String> name;
   final Value<String?> description;
   final Value<PgDateTime> createdAt;
@@ -4063,13 +4065,12 @@ class CharactersCompanion extends UpdateCompanion<Character> {
   });
   CharactersCompanion.insert({
     this.id = const Value.absent(),
-    required UuidValue franchiseId,
+    this.franchiseId = const Value.absent(),
     required String name,
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : franchiseId = Value(franchiseId),
-       name = Value(name);
+  }) : name = Value(name);
   static Insertable<Character> custom({
     Expression<UuidValue>? id,
     Expression<UuidValue>? franchiseId,
@@ -4090,7 +4091,7 @@ class CharactersCompanion extends UpdateCompanion<Character> {
 
   CharactersCompanion copyWith({
     Value<UuidValue>? id,
-    Value<UuidValue>? franchiseId,
+    Value<UuidValue?>? franchiseId,
     Value<String>? name,
     Value<String?>? description,
     Value<PgDateTime>? createdAt,
@@ -6813,26 +6814,8 @@ class $PostCharactersTable extends PostCharacters
           'REFERENCES characters (id)',
         ),
       );
-  static const VerificationMeta _contextFranchiseIdMeta =
-      const VerificationMeta('contextFranchiseId');
   @override
-  late final GeneratedColumn<UuidValue> contextFranchiseId =
-      GeneratedColumn<UuidValue>(
-        'context_franchise_id',
-        aliasedName,
-        true,
-        type: PgTypes.uuid,
-        requiredDuringInsert: false,
-        defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES franchises (id)',
-        ),
-      );
-  @override
-  List<GeneratedColumn> get $columns => [
-    postId,
-    characterId,
-    contextFranchiseId,
-  ];
+  List<GeneratedColumn> get $columns => [postId, characterId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -6864,15 +6847,6 @@ class $PostCharactersTable extends PostCharacters
     } else if (isInserting) {
       context.missing(_characterIdMeta);
     }
-    if (data.containsKey('context_franchise_id')) {
-      context.handle(
-        _contextFranchiseIdMeta,
-        contextFranchiseId.isAcceptableOrUnknown(
-          data['context_franchise_id']!,
-          _contextFranchiseIdMeta,
-        ),
-      );
-    }
     return context;
   }
 
@@ -6890,10 +6864,6 @@ class $PostCharactersTable extends PostCharacters
         PgTypes.uuid,
         data['${effectivePrefix}character_id'],
       )!,
-      contextFranchiseId: attachedDatabase.typeMapping.read(
-        PgTypes.uuid,
-        data['${effectivePrefix}context_franchise_id'],
-      ),
     );
   }
 
@@ -6906,23 +6876,12 @@ class $PostCharactersTable extends PostCharacters
 class PostCharacter extends DataClass implements Insertable<PostCharacter> {
   final UuidValue postId;
   final UuidValue characterId;
-  final UuidValue? contextFranchiseId;
-  const PostCharacter({
-    required this.postId,
-    required this.characterId,
-    this.contextFranchiseId,
-  });
+  const PostCharacter({required this.postId, required this.characterId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['post_id'] = Variable<UuidValue>(postId, PgTypes.uuid);
     map['character_id'] = Variable<UuidValue>(characterId, PgTypes.uuid);
-    if (!nullToAbsent || contextFranchiseId != null) {
-      map['context_franchise_id'] = Variable<UuidValue>(
-        contextFranchiseId,
-        PgTypes.uuid,
-      );
-    }
     return map;
   }
 
@@ -6930,9 +6889,6 @@ class PostCharacter extends DataClass implements Insertable<PostCharacter> {
     return PostCharactersCompanion(
       postId: Value(postId),
       characterId: Value(characterId),
-      contextFranchiseId: contextFranchiseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(contextFranchiseId),
     );
   }
 
@@ -6944,9 +6900,6 @@ class PostCharacter extends DataClass implements Insertable<PostCharacter> {
     return PostCharacter(
       postId: serializer.fromJson<UuidValue>(json['postId']),
       characterId: serializer.fromJson<UuidValue>(json['characterId']),
-      contextFranchiseId: serializer.fromJson<UuidValue?>(
-        json['contextFranchiseId'],
-      ),
     );
   }
   @override
@@ -6955,30 +6908,20 @@ class PostCharacter extends DataClass implements Insertable<PostCharacter> {
     return <String, dynamic>{
       'postId': serializer.toJson<UuidValue>(postId),
       'characterId': serializer.toJson<UuidValue>(characterId),
-      'contextFranchiseId': serializer.toJson<UuidValue?>(contextFranchiseId),
     };
   }
 
-  PostCharacter copyWith({
-    UuidValue? postId,
-    UuidValue? characterId,
-    Value<UuidValue?> contextFranchiseId = const Value.absent(),
-  }) => PostCharacter(
-    postId: postId ?? this.postId,
-    characterId: characterId ?? this.characterId,
-    contextFranchiseId: contextFranchiseId.present
-        ? contextFranchiseId.value
-        : this.contextFranchiseId,
-  );
+  PostCharacter copyWith({UuidValue? postId, UuidValue? characterId}) =>
+      PostCharacter(
+        postId: postId ?? this.postId,
+        characterId: characterId ?? this.characterId,
+      );
   PostCharacter copyWithCompanion(PostCharactersCompanion data) {
     return PostCharacter(
       postId: data.postId.present ? data.postId.value : this.postId,
       characterId: data.characterId.present
           ? data.characterId.value
           : this.characterId,
-      contextFranchiseId: data.contextFranchiseId.present
-          ? data.contextFranchiseId.value
-          : this.contextFranchiseId,
     );
   }
 
@@ -6986,52 +6929,44 @@ class PostCharacter extends DataClass implements Insertable<PostCharacter> {
   String toString() {
     return (StringBuffer('PostCharacter(')
           ..write('postId: $postId, ')
-          ..write('characterId: $characterId, ')
-          ..write('contextFranchiseId: $contextFranchiseId')
+          ..write('characterId: $characterId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(postId, characterId, contextFranchiseId);
+  int get hashCode => Object.hash(postId, characterId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PostCharacter &&
           other.postId == this.postId &&
-          other.characterId == this.characterId &&
-          other.contextFranchiseId == this.contextFranchiseId);
+          other.characterId == this.characterId);
 }
 
 class PostCharactersCompanion extends UpdateCompanion<PostCharacter> {
   final Value<UuidValue> postId;
   final Value<UuidValue> characterId;
-  final Value<UuidValue?> contextFranchiseId;
   final Value<int> rowid;
   const PostCharactersCompanion({
     this.postId = const Value.absent(),
     this.characterId = const Value.absent(),
-    this.contextFranchiseId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PostCharactersCompanion.insert({
     required UuidValue postId,
     required UuidValue characterId,
-    this.contextFranchiseId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : postId = Value(postId),
        characterId = Value(characterId);
   static Insertable<PostCharacter> custom({
     Expression<UuidValue>? postId,
     Expression<UuidValue>? characterId,
-    Expression<UuidValue>? contextFranchiseId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (postId != null) 'post_id': postId,
       if (characterId != null) 'character_id': characterId,
-      if (contextFranchiseId != null)
-        'context_franchise_id': contextFranchiseId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -7039,13 +6974,11 @@ class PostCharactersCompanion extends UpdateCompanion<PostCharacter> {
   PostCharactersCompanion copyWith({
     Value<UuidValue>? postId,
     Value<UuidValue>? characterId,
-    Value<UuidValue?>? contextFranchiseId,
     Value<int>? rowid,
   }) {
     return PostCharactersCompanion(
       postId: postId ?? this.postId,
       characterId: characterId ?? this.characterId,
-      contextFranchiseId: contextFranchiseId ?? this.contextFranchiseId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -7062,12 +6995,6 @@ class PostCharactersCompanion extends UpdateCompanion<PostCharacter> {
         PgTypes.uuid,
       );
     }
-    if (contextFranchiseId.present) {
-      map['context_franchise_id'] = Variable<UuidValue>(
-        contextFranchiseId.value,
-        PgTypes.uuid,
-      );
-    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -7079,7 +7006,6 @@ class PostCharactersCompanion extends UpdateCompanion<PostCharacter> {
     return (StringBuffer('PostCharactersCompanion(')
           ..write('postId: $postId, ')
           ..write('characterId: $characterId, ')
-          ..write('contextFranchiseId: $contextFranchiseId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -11895,29 +11821,6 @@ final class $$FranchisesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
-
-  static MultiTypedResultKey<$PostCharactersTable, List<PostCharacter>>
-  _postCharactersRefsTable(_$PostflowDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.postCharacters,
-        aliasName: $_aliasNameGenerator(
-          db.franchises.id,
-          db.postCharacters.contextFranchiseId,
-        ),
-      );
-
-  $$PostCharactersTableProcessedTableManager get postCharactersRefs {
-    final manager = $$PostCharactersTableTableManager($_db, $_db.postCharacters)
-        .filter(
-          (f) =>
-              f.contextFranchiseId.id.sqlEquals($_itemColumn<UuidValue>('id')!),
-        );
-
-    final cache = $_typedResult.readTableOrNull(_postCharactersRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
 }
 
 class $$FranchisesTableFilterComposer
@@ -11965,31 +11868,6 @@ class $$FranchisesTableFilterComposer
           }) => $$CharactersTableFilterComposer(
             $db: $db,
             $table: $db.characters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> postCharactersRefs(
-    Expression<bool> Function($$PostCharactersTableFilterComposer f) f,
-  ) {
-    final $$PostCharactersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.postCharacters,
-      getReferencedColumn: (t) => t.contextFranchiseId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PostCharactersTableFilterComposer(
-            $db: $db,
-            $table: $db.postCharacters,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12077,31 +11955,6 @@ class $$FranchisesTableAnnotationComposer
     );
     return f(composer);
   }
-
-  Expression<T> postCharactersRefs<T extends Object>(
-    Expression<T> Function($$PostCharactersTableAnnotationComposer a) f,
-  ) {
-    final $$PostCharactersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.postCharacters,
-      getReferencedColumn: (t) => t.contextFranchiseId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PostCharactersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.postCharacters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$FranchisesTableTableManager
@@ -12117,7 +11970,7 @@ class $$FranchisesTableTableManager
           $$FranchisesTableUpdateCompanionBuilder,
           (Franchise, $$FranchisesTableReferences),
           Franchise,
-          PrefetchHooks Function({bool charactersRefs, bool postCharactersRefs})
+          PrefetchHooks Function({bool charactersRefs})
         > {
   $$FranchisesTableTableManager(_$PostflowDatabase db, $FranchisesTable table)
     : super(
@@ -12166,63 +12019,38 @@ class $$FranchisesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback:
-              ({charactersRefs = false, postCharactersRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (charactersRefs) db.characters,
-                    if (postCharactersRefs) db.postCharacters,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (charactersRefs)
-                        await $_getPrefetchedData<
-                          Franchise,
-                          $FranchisesTable,
-                          Character
-                        >(
-                          currentTable: table,
-                          referencedTable: $$FranchisesTableReferences
-                              ._charactersRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$FranchisesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).charactersRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.franchiseId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (postCharactersRefs)
-                        await $_getPrefetchedData<
-                          Franchise,
-                          $FranchisesTable,
-                          PostCharacter
-                        >(
-                          currentTable: table,
-                          referencedTable: $$FranchisesTableReferences
-                              ._postCharactersRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$FranchisesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).postCharactersRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.contextFranchiseId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
+          prefetchHooksCallback: ({charactersRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (charactersRefs) db.characters],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (charactersRefs)
+                    await $_getPrefetchedData<
+                      Franchise,
+                      $FranchisesTable,
+                      Character
+                    >(
+                      currentTable: table,
+                      referencedTable: $$FranchisesTableReferences
+                          ._charactersRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$FranchisesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).charactersRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.franchiseId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
+            );
+          },
         ),
       );
 }
@@ -12239,12 +12067,12 @@ typedef $$FranchisesTableProcessedTableManager =
       $$FranchisesTableUpdateCompanionBuilder,
       (Franchise, $$FranchisesTableReferences),
       Franchise,
-      PrefetchHooks Function({bool charactersRefs, bool postCharactersRefs})
+      PrefetchHooks Function({bool charactersRefs})
     >;
 typedef $$CharactersTableCreateCompanionBuilder =
     CharactersCompanion Function({
       Value<UuidValue> id,
-      required UuidValue franchiseId,
+      Value<UuidValue?> franchiseId,
       required String name,
       Value<String?> description,
       Value<PgDateTime> createdAt,
@@ -12253,7 +12081,7 @@ typedef $$CharactersTableCreateCompanionBuilder =
 typedef $$CharactersTableUpdateCompanionBuilder =
     CharactersCompanion Function({
       Value<UuidValue> id,
-      Value<UuidValue> franchiseId,
+      Value<UuidValue?> franchiseId,
       Value<String> name,
       Value<String?> description,
       Value<PgDateTime> createdAt,
@@ -12269,9 +12097,9 @@ final class $$CharactersTableReferences
         $_aliasNameGenerator(db.characters.franchiseId, db.franchises.id),
       );
 
-  $$FranchisesTableProcessedTableManager get franchiseId {
-    final $_column = $_itemColumn<UuidValue>('franchise_id')!;
-
+  $$FranchisesTableProcessedTableManager? get franchiseId {
+    final $_column = $_itemColumn<UuidValue>('franchise_id');
+    if ($_column == null) return null;
     final manager = $$FranchisesTableTableManager(
       $_db,
       $_db.franchises,
@@ -12538,7 +12366,7 @@ class $$CharactersTableTableManager
           updateCompanionCallback:
               ({
                 Value<UuidValue> id = const Value.absent(),
-                Value<UuidValue> franchiseId = const Value.absent(),
+                Value<UuidValue?> franchiseId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<PgDateTime> createdAt = const Value.absent(),
@@ -12554,7 +12382,7 @@ class $$CharactersTableTableManager
           createCompanionCallback:
               ({
                 Value<UuidValue> id = const Value.absent(),
-                required UuidValue franchiseId,
+                Value<UuidValue?> franchiseId = const Value.absent(),
                 required String name,
                 Value<String?> description = const Value.absent(),
                 Value<PgDateTime> createdAt = const Value.absent(),
@@ -15563,14 +15391,12 @@ typedef $$PostCharactersTableCreateCompanionBuilder =
     PostCharactersCompanion Function({
       required UuidValue postId,
       required UuidValue characterId,
-      Value<UuidValue?> contextFranchiseId,
       Value<int> rowid,
     });
 typedef $$PostCharactersTableUpdateCompanionBuilder =
     PostCharactersCompanion Function({
       Value<UuidValue> postId,
       Value<UuidValue> characterId,
-      Value<UuidValue?> contextFranchiseId,
       Value<int> rowid,
     });
 
@@ -15617,28 +15443,6 @@ final class $$PostCharactersTableReferences
       $_db.characters,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_characterIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $FranchisesTable _contextFranchiseIdTable(_$PostflowDatabase db) =>
-      db.franchises.createAlias(
-        $_aliasNameGenerator(
-          db.postCharacters.contextFranchiseId,
-          db.franchises.id,
-        ),
-      );
-
-  $$FranchisesTableProcessedTableManager? get contextFranchiseId {
-    final $_column = $_itemColumn<UuidValue>('context_franchise_id');
-    if ($_column == null) return null;
-    final manager = $$FranchisesTableTableManager(
-      $_db,
-      $_db.franchises,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_contextFranchiseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -15692,29 +15496,6 @@ class $$PostCharactersTableFilterComposer
           }) => $$CharactersTableFilterComposer(
             $db: $db,
             $table: $db.characters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$FranchisesTableFilterComposer get contextFranchiseId {
-    final $$FranchisesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.contextFranchiseId,
-      referencedTable: $db.franchises,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FranchisesTableFilterComposer(
-            $db: $db,
-            $table: $db.franchises,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -15779,29 +15560,6 @@ class $$PostCharactersTableOrderingComposer
     );
     return composer;
   }
-
-  $$FranchisesTableOrderingComposer get contextFranchiseId {
-    final $$FranchisesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.contextFranchiseId,
-      referencedTable: $db.franchises,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FranchisesTableOrderingComposer(
-            $db: $db,
-            $table: $db.franchises,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PostCharactersTableAnnotationComposer
@@ -15858,29 +15616,6 @@ class $$PostCharactersTableAnnotationComposer
     );
     return composer;
   }
-
-  $$FranchisesTableAnnotationComposer get contextFranchiseId {
-    final $$FranchisesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.contextFranchiseId,
-      referencedTable: $db.franchises,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FranchisesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.franchises,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PostCharactersTableTableManager
@@ -15896,11 +15631,7 @@ class $$PostCharactersTableTableManager
           $$PostCharactersTableUpdateCompanionBuilder,
           (PostCharacter, $$PostCharactersTableReferences),
           PostCharacter,
-          PrefetchHooks Function({
-            bool postId,
-            bool characterId,
-            bool contextFranchiseId,
-          })
+          PrefetchHooks Function({bool postId, bool characterId})
         > {
   $$PostCharactersTableTableManager(
     _$PostflowDatabase db,
@@ -15919,24 +15650,20 @@ class $$PostCharactersTableTableManager
               ({
                 Value<UuidValue> postId = const Value.absent(),
                 Value<UuidValue> characterId = const Value.absent(),
-                Value<UuidValue?> contextFranchiseId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PostCharactersCompanion(
                 postId: postId,
                 characterId: characterId,
-                contextFranchiseId: contextFranchiseId,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required UuidValue postId,
                 required UuidValue characterId,
-                Value<UuidValue?> contextFranchiseId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PostCharactersCompanion.insert(
                 postId: postId,
                 characterId: characterId,
-                contextFranchiseId: contextFranchiseId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -15947,84 +15674,62 @@ class $$PostCharactersTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback:
-              ({
-                postId = false,
-                characterId = false,
-                contextFranchiseId = false,
-              }) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (postId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.postId,
-                                    referencedTable:
-                                        $$PostCharactersTableReferences
-                                            ._postIdTable(db),
-                                    referencedColumn:
-                                        $$PostCharactersTableReferences
-                                            ._postIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-                        if (characterId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.characterId,
-                                    referencedTable:
-                                        $$PostCharactersTableReferences
-                                            ._characterIdTable(db),
-                                    referencedColumn:
-                                        $$PostCharactersTableReferences
-                                            ._characterIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-                        if (contextFranchiseId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.contextFranchiseId,
-                                    referencedTable:
-                                        $$PostCharactersTableReferences
-                                            ._contextFranchiseIdTable(db),
-                                    referencedColumn:
-                                        $$PostCharactersTableReferences
-                                            ._contextFranchiseIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
+          prefetchHooksCallback: ({postId = false, characterId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (postId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.postId,
+                                referencedTable: $$PostCharactersTableReferences
+                                    ._postIdTable(db),
+                                referencedColumn:
+                                    $$PostCharactersTableReferences
+                                        ._postIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (characterId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.characterId,
+                                referencedTable: $$PostCharactersTableReferences
+                                    ._characterIdTable(db),
+                                referencedColumn:
+                                    $$PostCharactersTableReferences
+                                        ._characterIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
 
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return state;
                   },
-                );
+              getPrefetchedDataCallback: (items) async {
+                return [];
               },
+            );
+          },
         ),
       );
 }
@@ -16041,11 +15746,7 @@ typedef $$PostCharactersTableProcessedTableManager =
       $$PostCharactersTableUpdateCompanionBuilder,
       (PostCharacter, $$PostCharactersTableReferences),
       PostCharacter,
-      PrefetchHooks Function({
-        bool postId,
-        bool characterId,
-        bool contextFranchiseId,
-      })
+      PrefetchHooks Function({bool postId, bool characterId})
     >;
 typedef $$PostSchedulesTableCreateCompanionBuilder =
     PostSchedulesCompanion Function({

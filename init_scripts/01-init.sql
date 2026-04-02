@@ -120,7 +120,7 @@ CREATE INDEX ON franchises USING gin (name gin_trgm_ops);
 
 CREATE TABLE characters (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    franchise_id UUID NOT NULL REFERENCES franchises(id) ON DELETE RESTRICT,
+    franchise_id UUID REFERENCES franchises(id) ON DELETE SET NULL,
     name         TEXT NOT NULL,
     description  TEXT,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -203,12 +203,9 @@ CREATE TABLE post_artists (
 );
 
 -- Many-to-many: post ↔ character
--- context_franchise_id: which setting the character appears in on this specific artwork
--- (e.g. Rem drawn in a crossover setting — pick the relevant franchise, not her canon one)
 CREATE TABLE post_characters (
-    post_id              UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-    character_id         UUID NOT NULL REFERENCES characters(id) ON DELETE RESTRICT,
-    context_franchise_id UUID REFERENCES franchises(id) ON DELETE SET NULL,
+    post_id      UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    character_id UUID NOT NULL REFERENCES characters(id) ON DELETE RESTRICT,
     PRIMARY KEY (post_id, character_id)
 );
 

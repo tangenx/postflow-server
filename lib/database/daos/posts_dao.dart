@@ -40,10 +40,7 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
     required List<UuidValue> artistIds,
   }) async {
     final artists = artistIds
-        .mapIndexed(
-          (index, id) =>
-              PostArtistsCompanion.insert(postId: postId, artistId: id),
-        )
+        .map((id) => PostArtistsCompanion.insert(postId: postId, artistId: id))
         .toList();
 
     batch((b) => b.insertAll(postArtists, artists));
@@ -51,15 +48,12 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
 
   Future<void> attachPostCharacters({
     required UuidValue postId,
-    required List<PostCharacterRef> refs,
+    required List<UuidValue> characterIds,
   }) async {
-    final characters = refs
-        .mapIndexed(
-          (index, ref) => PostCharactersCompanion.insert(
-            postId: postId,
-            characterId: ref.characterId,
-            contextFranchiseId: Value.absentIfNull(ref.contextFranchiseId),
-          ),
+    final characters = characterIds
+        .map(
+          (id) =>
+              PostCharactersCompanion.insert(postId: postId, characterId: id),
         )
         .toList();
 
@@ -257,11 +251,4 @@ class PostWithRelations {
       'characters': characters.map((c) => c.toJson()).toList(),
     };
   }
-}
-
-class PostCharacterRef {
-  final UuidValue characterId;
-  final UuidValue? contextFranchiseId;
-
-  const PostCharacterRef({required this.characterId, this.contextFranchiseId});
 }

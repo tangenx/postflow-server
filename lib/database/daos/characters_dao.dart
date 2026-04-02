@@ -7,14 +7,14 @@ class CharactersDao extends DatabaseAccessor<PostflowDatabase>
 
   // C
   Future<Character> create({
-    required UuidValue franchiseId,
     required String name,
+    UuidValue? franchiseId,
     String? description,
   }) {
     final character = CharactersCompanion.insert(
-      franchiseId: franchiseId,
       name: name,
       description: Value.absentIfNull(description),
+      franchiseId: Value.absentIfNull(franchiseId),
     );
 
     return into(characters).insertReturning(character);

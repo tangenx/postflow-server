@@ -27,7 +27,7 @@ class FakePostsDao implements PostsDao {
 
   List<UuidValue>? attachedArtistIds;
 
-  List<PostCharacterRef>? attachedCharacterRefs;
+  List<UuidValue>? attachedCharacterIds;
 
   PostWithRelations? postWithRelationsResult;
 
@@ -74,9 +74,9 @@ class FakePostsDao implements PostsDao {
   @override
   Future<void> attachPostCharacters({
     required UuidValue postId,
-    required List<PostCharacterRef> refs,
+    required List<UuidValue> characterIds,
   }) async {
-    attachedCharacterRefs = refs;
+    attachedCharacterIds = characterIds;
   }
 
   @override
@@ -159,7 +159,7 @@ class FakeCharactersDao implements CharactersDao {
 
   @override
   Future<Character> create({
-    required UuidValue franchiseId,
+    UuidValue? franchiseId,
     required String name,
     String? description,
   }) async {
@@ -190,7 +190,6 @@ const _mediaId = '770e8400-e29b-41d4-a716-446655440002';
 const _artistId = '880e8400-e29b-41d4-a716-446655440003';
 const _characterId = '990e8400-e29b-41d4-a716-446655440004';
 const _franchiseId = 'aa0e8400-e29b-41d4-a716-446655440005';
-const _contextFranchiseId = 'bb0e8400-e29b-41d4-a716-446655440006';
 
 final _testPost = Post(
   id: UuidValue.fromString(_postId),
@@ -258,12 +257,7 @@ void main() {
           description: 'test description',
           media: [UuidValue.fromString(_mediaId)],
           artists: [ArtistRef(id: UuidValue.fromString(_artistId))],
-          characters: [
-            CharacterRef(
-              id: UuidValue.fromString(_characterId),
-              contextFranchiseId: UuidValue.fromString(_contextFranchiseId),
-            ),
-          ],
+          characters: [CharacterRef(id: UuidValue.fromString(_characterId))],
         );
 
         final result = await service.createPost(
@@ -278,9 +272,9 @@ void main() {
         expect(fakePostsDao.attachedArtistIds, [
           UuidValue.fromString(_artistId),
         ]);
-        expect(fakePostsDao.attachedCharacterRefs?.length, 1);
+        expect(fakePostsDao.attachedCharacterIds?.length, 1);
         expect(
-          fakePostsDao.attachedCharacterRefs?.first.characterId,
+          fakePostsDao.attachedCharacterIds?.first,
           UuidValue.fromString(_characterId),
         );
         expect(result, _testPostWithRelations);
@@ -317,7 +311,6 @@ void main() {
             CharacterRef(
               name: 'NewChar',
               franchiseId: UuidValue.fromString(_franchiseId),
-              contextFranchiseId: UuidValue.fromString(_contextFranchiseId),
             ),
           ],
         );
@@ -420,12 +413,7 @@ void main() {
           fakePostsDao.postWithRelationsResult = _testPostWithRelations;
 
           final request = UpdatePostRequest(
-            characters: [
-              CharacterRef(
-                id: UuidValue.fromString(_characterId),
-                contextFranchiseId: UuidValue.fromString(_contextFranchiseId),
-              ),
-            ],
+            characters: [CharacterRef(id: UuidValue.fromString(_characterId))],
           );
 
           await service.updatePost(
@@ -435,7 +423,7 @@ void main() {
           );
 
           expect(fakePostsDao.detachCharactersCalled, 1);
-          expect(fakePostsDao.attachedCharacterRefs?.length, 1);
+          expect(fakePostsDao.attachedCharacterIds?.length, 1);
         },
       );
 

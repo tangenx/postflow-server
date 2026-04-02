@@ -49,7 +49,7 @@ class FakeCharactersDao implements CharactersDao {
 
   @override
   Future<Character> create({
-    required UuidValue franchiseId,
+    UuidValue? franchiseId,
     required String name,
     String? description,
   }) async {
@@ -293,10 +293,7 @@ void main() {
           'name': 'Broken',
         });
 
-        expect(
-          () => handler.create(request),
-          throwsA(isA<FormatException>()),
-        );
+        expect(() => handler.create(request), throwsA(isA<FormatException>()));
       });
     });
 
@@ -327,9 +324,7 @@ void main() {
       });
 
       test('handles null franchise_id in body', () async {
-        final request = _jsonPut('characters/$_charId1', {
-          'name': 'Miku',
-        });
+        final request = _jsonPut('characters/$_charId1', {'name': 'Miku'});
 
         final response = await handler.update(request, _charId1);
 

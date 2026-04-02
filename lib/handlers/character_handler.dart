@@ -47,10 +47,9 @@ class CharacterHandler {
     final data = RequestValidation.parseJsonObject(
       await request.readAsString(),
     );
-    final franchiseIdRaw = RequestValidation.requiredString(
+    final franchiseIdRaw = RequestValidation.optionalString(
       data,
       'franchise_id',
-      minLength: 1,
       maxLength: 64,
     );
     final name = RequestValidation.requiredString(
@@ -66,7 +65,9 @@ class CharacterHandler {
     );
 
     final character = await _charactersDao.create(
-      franchiseId: UuidValue.withValidation(franchiseIdRaw),
+      franchiseId: franchiseIdRaw != null
+          ? UuidValue.withValidation(franchiseIdRaw)
+          : null,
       name: name,
       description: description,
     );
