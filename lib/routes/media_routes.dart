@@ -5,11 +5,11 @@ import '../handlers/media_handler.dart';
 Router mediaRouter(MediaHandler handler) {
   final router = Router();
 
-  router.get('/api/media/files/<path>', handler.serveFile);
-  router.post('/api/media/upload', handler.upload);
-  router.post('/api/media/remote', handler.saveRemote);
-  router.get('/api/media/:id', handler.getById);
-  router.delete('/api/media/:id', handler.delete);
+  router.get('/files/<path>', handler.serveFile);
+  router.post('/upload', handler.upload);
+  router.post('/remote', handler.saveRemote);
+  router.get('/<id>', handler.getById);
+  router.delete('/<id>', handler.delete);
 
   return router;
 }
