@@ -38,17 +38,25 @@ void main() {
         );
       });
 
-      test('throws on invalid JSON', () {
+      test('throws ValidationException on invalid JSON', () {
         expect(
           () => RequestValidation.parseJsonObject('not json'),
-          throwsA(isA<FormatException>()),
+          throwsA(
+            isA<ValidationException>().having(
+              (e) => e.message,
+              'message',
+              contains('valid JSON'),
+            ),
+          ),
         );
       });
     });
 
     group('requiredString', () {
       test('returns trimmed string', () {
-        final result = RequestValidation.requiredString({'k': '  hello  '}, 'k');
+        final result = RequestValidation.requiredString({
+          'k': '  hello  ',
+        }, 'k');
         expect(result, equals('hello'));
       });
 
@@ -75,11 +83,8 @@ void main() {
 
       test('throws when shorter than minLength', () {
         expect(
-          () => RequestValidation.requiredString(
-            {'k': 'ab'},
-            'k',
-            minLength: 3,
-          ),
+          () =>
+              RequestValidation.requiredString({'k': 'ab'}, 'k', minLength: 3),
           throwsA(isA<ValidationException>()),
         );
       });
@@ -170,10 +175,9 @@ void main() {
       });
 
       test('returns parsed value for valid integer', () {
-        final result = RequestValidation.optionalPositiveInt(
-          {'limit': '25'},
-          'limit',
-        );
+        final result = RequestValidation.optionalPositiveInt({
+          'limit': '25',
+        }, 'limit');
         expect(result, equals(25));
       });
 
