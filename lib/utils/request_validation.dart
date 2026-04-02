@@ -8,7 +8,12 @@ class RequestValidation {
       throw ValidationException('Request body must be a JSON object');
     }
 
-    final decoded = jsonDecode(body);
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(body);
+    } on FormatException {
+      throw ValidationException('Request body must be valid JSON');
+    }
     if (decoded is! Map<String, dynamic>) {
       throw ValidationException('Request body must be a JSON object');
     }
