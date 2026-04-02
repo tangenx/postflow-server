@@ -66,8 +66,10 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
     batch((b) => b.insertAll(postCharacters, characters));
   }
 
-  Future<Post?> findPostById(UuidValue id) async {
-    return (select(posts)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+  Future<Post?> findPostById(UuidValue id, UuidValue userId) async {
+    return (select(posts)
+          ..where((tbl) => tbl.id.equals(id) & tbl.createdBy.equals(userId)))
+        .getSingleOrNull();
   }
 
   Future<List<Post>> findPostsByUserId(
@@ -95,8 +97,11 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
     return row.read(count)!;
   }
 
-  Future<PostWithRelations?> findPostWithRelationsById(UuidValue id) async {
-    final post = await findPostById(id);
+  Future<PostWithRelations?> findPostWithRelationsById(
+    UuidValue id,
+    UuidValue userId,
+  ) async {
+    final post = await findPostById(id, userId);
 
     if (post == null) {
       return null;
@@ -105,8 +110,23 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
     return _loadRelations(post);
   }
 
+  Future<List<PostWithRelations>> findPostsWithRelationsById(
+    UuidValue userId, {
+    int page = 1,
+    int pageSize = 10,
+  }) async {
+    final posts = await findPostsByUserId(
+      userId,
+      page: page,
+      pageSize: pageSize,
+    );
+
+    return Future.wait(posts.map(_loadRelations));
+  }
+
   Future<Post> updatePost({
     required UuidValue id,
+    required UuidValue userId,
     String? internalNote,
     String? description,
     PostStatus? status,
@@ -117,9 +137,11 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
       status: Value.absentIfNull(status),
     );
 
-    final updated = await (update(
-      posts,
-    )..where((tbl) => tbl.id.equals(id))).writeReturning(post);
+    final updated =
+        await (update(
+              posts,
+            )..where((tbl) => tbl.id.equals(id) & tbl.createdBy.equals(userId)))
+            .writeReturning(post);
 
     if (updated.isEmpty) {
       throw NotFoundException('Post not found');
@@ -146,20 +168,25 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
         .go();
   }
 
-  Future<void> detachCharacterItem(UuidValue postId, UuidValue characterId) =>
-      (delete(postCharacters)..where(
-            (c) => c.postId.equals(postId) & c.characterId.equals(characterId),
-          ))
-          .go();
+  Future<void> detachCharacterItem(UuidValue postId, UuidValue characterId) {
+    return (delete(postCharacters)..where(
+          (c) => c.postId.equals(postId) & c.characterId.equals(characterId),
+        ))
+        .go();
+  }
 
-  Future<void> detachMediaItem(UuidValue postId, UuidValue mediaId) =>
-      (delete(postMedia)..where(
-            (m) => m.postId.equals(postId) & m.mediaFileId.equals(mediaId),
-          ))
-          .go();
+  Future<void> detachMediaItem(UuidValue postId, UuidValue mediaId) {
+    return (delete(postMedia)..where(
+          (m) => m.postId.equals(postId) & m.mediaFileId.equals(mediaId),
+        ))
+        .go();
+  }
 
-  Future<void> deletePost(UuidValue postId) =>
-      (delete(posts)..where((p) => p.id.equals(postId))).go();
+  Future<void> deletePost(UuidValue postId, UuidValue userId) {
+    return (delete(
+      posts,
+    )..where((p) => p.id.equals(postId) & p.createdBy.equals(userId))).go();
+  }
 
   Future<PostWithRelations> _loadRelations(Post post) async {
     final media =
@@ -216,6 +243,20 @@ class PostWithRelations {
     required this.artists,
     required this.characters,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': post.id.toString(),
+      'internal_note': post.internalNote,
+      'description': post.description,
+      'status': post.status.name,
+      'created_at': post.createdAt.dateTime.toIso8601String(),
+      'updated_at': post.updatedAt.dateTime.toIso8601String(),
+      'media': media.map((m) => m.toJson()).toList(),
+      'artists': artists.map((a) => a.toJson()).toList(),
+      'characters': characters.map((c) => c.toJson()).toList(),
+    };
+  }
 }
 
 class PostCharacterRef {
