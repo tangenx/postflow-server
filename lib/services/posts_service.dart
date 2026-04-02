@@ -8,16 +8,19 @@ class PostsService {
   final PostsDao _postsDao;
   final ArtistsDao _artistsDao;
   final CharactersDao _charactersDao;
+  final FranchisesDao _franchisesDao;
   final PostflowDatabase _db;
 
   PostsService({
     required PostsDao postsDao,
     required ArtistsDao artistsDao,
     required CharactersDao charactersDao,
+    required FranchisesDao franchisesDao,
     required PostflowDatabase db,
   }) : _postsDao = postsDao,
        _artistsDao = artistsDao,
        _charactersDao = charactersDao,
+       _franchisesDao = franchisesDao,
        _db = db;
 
   Future<PostWithRelations> createPost({
@@ -33,12 +36,17 @@ class PostsService {
 
       final characterRefs = await _resolveCharacters(request.characters);
       final artistRefs = await _resolveArtists(request.artists);
+      final franchiseRefs = await _resolveFranchises(request.franchises);
 
       await _postsDao.attachPostMedia(postId: post.id, mediaIds: request.media);
       await _postsDao.attachPostArtists(postId: post.id, artistIds: artistRefs);
       await _postsDao.attachPostCharacters(
         postId: post.id,
-        refs: characterRefs,
+        characterIds: characterRefs,
+      );
+      await _postsDao.attachPostFranchises(
+        postId: post.id,
+        franchiseIds: franchiseRefs,
       );
 
       return (await _postsDao.findPostWithRelationsById(post.id, userId))!;
@@ -81,7 +89,16 @@ class PostsService {
         final characterRefs = await _resolveCharacters(request.characters!);
         await _postsDao.attachPostCharacters(
           postId: postId,
-          refs: characterRefs,
+          characterIds: characterRefs,
+        );
+      }
+
+      if (request.franchises != null) {
+        await _postsDao.detachFranchises(postId);
+        final franchiseRefs = await _resolveFranchises(request.franchises!);
+        await _postsDao.attachPostFranchises(
+          postId: postId,
+          franchiseIds: franchiseRefs,
         );
       }
 
@@ -137,33 +154,40 @@ class PostsService {
     return ids;
   }
 
-  Future<List<PostCharacterRef>> _resolveCharacters(
-    List<CharacterRef> refs,
-  ) async {
-    final characters = List<PostCharacterRef>.empty(growable: true);
+  Future<List<UuidValue>> _resolveCharacters(List<CharacterRef> refs) async {
+    final ids = List<UuidValue>.empty(growable: true);
 
     for (final ref in refs) {
-      UuidValue? characterId;
-
       if (ref.id != null) {
-        characterId = ref.id;
+        ids.add(ref.id!);
       } else {
         final character = await _charactersDao.create(
           name: ref.name!,
-          franchiseId: ref.franchiseId!,
+          franchiseId: ref.franchiseId,
         );
-        characterId = character.id;
+        ids.add(character.id);
       }
-
-      characters.add(
-        PostCharacterRef(
-          characterId: characterId!,
-          contextFranchiseId: ref.contextFranchiseId,
-        ),
-      );
     }
 
-    return characters;
+    return ids;
+  }
+
+  Future<List<UuidValue>> _resolveFranchises(List<FranchiseRef> refs) async {
+    final ids = List<UuidValue>.empty(growable: true);
+
+    for (final ref in refs) {
+      if (ref.id != null) {
+        ids.add(ref.id!);
+      } else {
+        final franchise = await _franchisesDao.create(
+          name: ref.name!,
+          description: ref.description,
+        );
+        ids.add(franchise.id);
+      }
+    }
+
+    return ids;
   }
 }
 
@@ -173,6 +197,7 @@ class CreatePostRequest {
   final List<UuidValue> media;
   final List<ArtistRef> artists;
   final List<CharacterRef> characters;
+  final List<FranchiseRef> franchises;
 
   const CreatePostRequest({
     this.internalNote,
@@ -180,6 +205,7 @@ class CreatePostRequest {
     required this.media,
     required this.artists,
     required this.characters,
+    required this.franchises,
   });
 
   factory CreatePostRequest.fromJson(Map<String, dynamic> json) {
@@ -195,6 +221,9 @@ class CreatePostRequest {
       characters: (json['characters'] as List<dynamic>)
           .map((c) => CharacterRef.fromJson(c as Map<String, dynamic>))
           .toList(),
+      franchises: (json['franchises'] as List<dynamic>)
+          .map((f) => FranchiseRef.fromJson(f as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -206,6 +235,7 @@ class UpdatePostRequest {
   final List<UuidValue>? mediaIds;
   final List<ArtistRef>? artists;
   final List<CharacterRef>? characters;
+  final List<FranchiseRef>? franchises;
 
   const UpdatePostRequest({
     this.internalNote,
@@ -214,6 +244,7 @@ class UpdatePostRequest {
     this.mediaIds,
     this.artists,
     this.characters,
+    this.franchises,
   });
 
   factory UpdatePostRequest.fromJson(Map<String, dynamic> json) {
@@ -236,6 +267,11 @@ class UpdatePostRequest {
       characters: json['characters'] != null
           ? (json['characters'] as List)
                 .map((c) => CharacterRef.fromJson(c as Map<String, dynamic>))
+                .toList()
+          : null,
+      franchises: json['franchises'] != null
+          ? (json['franchises'] as List)
+                .map((f) => FranchiseRef.fromJson(f as Map<String, dynamic>))
                 .toList()
           : null,
     );
@@ -263,15 +299,9 @@ class ArtistRef {
 class CharacterRef {
   final UuidValue? id; // if exists
   final String? name; // if new
-  final UuidValue? franchiseId; // required if new
-  final UuidValue? contextFranchiseId;
+  final UuidValue? franchiseId; // optional if new (character can be original)
 
-  const CharacterRef({
-    this.id,
-    this.name,
-    this.franchiseId,
-    this.contextFranchiseId,
-  });
+  const CharacterRef({this.id, this.name, this.franchiseId});
 
   factory CharacterRef.fromJson(Map<String, dynamic> json) {
     return CharacterRef(
@@ -282,9 +312,24 @@ class CharacterRef {
       franchiseId: json['franchise_id'] != null
           ? UuidValue.withValidation(json['franchise_id'] as String)
           : null,
-      contextFranchiseId: json['context_franchise_id'] != null
-          ? UuidValue.withValidation(json['context_franchise_id'] as String)
+    );
+  }
+}
+
+class FranchiseRef {
+  final UuidValue? id; // if exists
+  final String? name; // if new
+  final String? description; // if new
+
+  const FranchiseRef({this.id, this.name, this.description});
+
+  factory FranchiseRef.fromJson(Map<String, dynamic> json) {
+    return FranchiseRef(
+      id: json['id'] != null
+          ? UuidValue.withValidation(json['id'] as String)
           : null,
+      name: json['name'] as String?,
+      description: json['description'] as String?,
     );
   }
 }

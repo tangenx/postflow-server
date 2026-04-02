@@ -1,6 +1,8 @@
 part of '../database.dart';
 
-@DriftAccessor(tables: [Posts, PostMedia, PostArtists, PostCharacters])
+@DriftAccessor(
+  tables: [Posts, PostMedia, PostArtists, PostCharacters, PostFranchises],
+)
 class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
   PostsDao(super.attachedDatabase);
 
@@ -58,6 +60,20 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
         .toList();
 
     batch((b) => b.insertAll(postCharacters, characters));
+  }
+
+  Future<void> attachPostFranchises({
+    required UuidValue postId,
+    required List<UuidValue> franchiseIds,
+  }) async {
+    final franchises = franchiseIds
+        .map(
+          (id) =>
+              PostFranchisesCompanion.insert(postId: postId, franchiseId: id),
+        )
+        .toList();
+
+    batch((b) => b.insertAll(postFranchises, franchises));
   }
 
   Future<Post?> findPostById(UuidValue id, UuidValue userId) async {
@@ -152,6 +168,10 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
     return (delete(postCharacters)..where((c) => c.postId.equals(postId))).go();
   }
 
+  Future<void> detachFranchises(UuidValue postId) {
+    return (delete(postFranchises)..where((f) => f.postId.equals(postId))).go();
+  }
+
   Future<void> detachMedia(UuidValue postId) {
     return (delete(postMedia)..where((m) => m.postId.equals(postId))).go();
   }
@@ -165,6 +185,13 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
   Future<void> detachCharacterItem(UuidValue postId, UuidValue characterId) {
     return (delete(postCharacters)..where(
           (c) => c.postId.equals(postId) & c.characterId.equals(characterId),
+        ))
+        .go();
+  }
+
+  Future<void> detachFranchiseItem(UuidValue postId, UuidValue franchiseId) {
+    return (delete(postFranchises)..where(
+          (f) => f.postId.equals(postId) & f.franchiseId.equals(franchiseId),
         ))
         .go();
   }
@@ -216,11 +243,24 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
             .map((row) => row.readTable(characters))
             .get();
 
+    final franchisesFromPost =
+        await (select(postFranchises)
+              ..where((tbl) => tbl.postId.equals(post.id)))
+            .join([
+              innerJoin(
+                franchises,
+                franchises.id.equalsExp(postFranchises.franchiseId),
+              ),
+            ])
+            .map((row) => row.readTable(franchises))
+            .get();
+
     return PostWithRelations(
       post: post,
       media: media,
       artists: artistsFromPost,
       characters: charactersFromPost,
+      franchises: franchisesFromPost,
     );
   }
 }
@@ -230,12 +270,14 @@ class PostWithRelations {
   final List<MediaFile> media;
   final List<Artist> artists;
   final List<Character> characters;
+  final List<Franchise> franchises;
 
   const PostWithRelations({
     required this.post,
     required this.media,
     required this.artists,
     required this.characters,
+    required this.franchises,
   });
 
   Map<String, dynamic> toJson() {
@@ -249,6 +291,7 @@ class PostWithRelations {
       'media': media.map((m) => m.toJson()).toList(),
       'artists': artists.map((a) => a.toJson()).toList(),
       'characters': characters.map((c) => c.toJson()).toList(),
+      'franchises': franchises.map((f) => f.toJson()).toList(),
     };
   }
 }

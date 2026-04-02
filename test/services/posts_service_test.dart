@@ -29,6 +29,10 @@ class FakePostsDao implements PostsDao {
 
   List<UuidValue>? attachedCharacterIds;
 
+  List<UuidValue>? attachedFranchiseIds;
+
+  int detachFranchisesCalled = 0;
+
   PostWithRelations? postWithRelationsResult;
 
   List<PostWithRelations> postsWithRelationsResult = [];
@@ -168,6 +172,20 @@ class FakeCharactersDao implements CharactersDao {
   }
 }
 
+class FakeFranchisesDao implements FranchisesDao {
+  Franchise? franchiseToCreate;
+  int createCallCount = 0;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<Franchise> create({required String name, String? description}) async {
+    createCallCount++;
+    return franchiseToCreate!;
+  }
+}
+
 class FakeDatabase implements PostflowDatabase {
   @override
   dynamic noSuchMethod(Invocation invocation) {
@@ -206,6 +224,7 @@ final _testPostWithRelations = PostWithRelations(
   media: [],
   artists: [],
   characters: [],
+  franchises: [],
 );
 
 final _testArtist = Artist(
@@ -230,6 +249,7 @@ void main() {
   late FakePostsDao fakePostsDao;
   late FakeArtistsDao fakeArtistsDao;
   late FakeCharactersDao fakeCharactersDao;
+  late FakeFranchisesDao fakeFranchisesDao;
   late FakeDatabase fakeDb;
   late PostsService service;
 
@@ -237,11 +257,13 @@ void main() {
     fakePostsDao = FakePostsDao();
     fakeArtistsDao = FakeArtistsDao();
     fakeCharactersDao = FakeCharactersDao();
+    fakeFranchisesDao = FakeFranchisesDao();
     fakeDb = FakeDatabase();
     service = PostsService(
       postsDao: fakePostsDao,
       artistsDao: fakeArtistsDao,
       charactersDao: fakeCharactersDao,
+      franchisesDao: fakeFranchisesDao,
       db: fakeDb,
     );
   });
@@ -258,6 +280,7 @@ void main() {
           media: [UuidValue.fromString(_mediaId)],
           artists: [ArtistRef(id: UuidValue.fromString(_artistId))],
           characters: [CharacterRef(id: UuidValue.fromString(_characterId))],
+          franchises: [],
         );
 
         final result = await service.createPost(
@@ -289,6 +312,7 @@ void main() {
           media: [],
           artists: [ArtistRef(name: 'NewArtist', sourceUrl: 'https://x.com')],
           characters: [],
+          franchises: [],
         );
 
         await service.createPost(
@@ -313,6 +337,7 @@ void main() {
               franchiseId: UuidValue.fromString(_franchiseId),
             ),
           ],
+          franchises: [],
         );
 
         await service.createPost(
@@ -331,6 +356,7 @@ void main() {
           media: [],
           artists: [],
           characters: [],
+          franchises: [],
         );
 
         final result = await service.createPost(

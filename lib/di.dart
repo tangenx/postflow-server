@@ -81,6 +81,7 @@ void registerDependencies() {
       postsDao: sl.get<PostsDao>(),
       artistsDao: sl.get<ArtistsDao>(),
       charactersDao: sl.get<CharactersDao>(),
+      franchisesDao: sl.get<FranchisesDao>(),
       db: sl.get<PostflowDatabase>(),
     ),
   );

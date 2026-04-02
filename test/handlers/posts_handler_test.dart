@@ -110,6 +110,7 @@ final _testPostWithRelations = PostWithRelations(
   media: [],
   artists: [],
   characters: [],
+  franchises: [],
 );
 
 final _testMediaFile = MediaFile(
@@ -129,6 +130,7 @@ final _testPostWithMedia = PostWithRelations(
   media: [_testMediaFile],
   artists: [],
   characters: [],
+  franchises: [],
 );
 
 Request _withUserId(Request request) {
@@ -366,6 +368,7 @@ void main() {
           media: [],
           artists: [],
           characters: [],
+          franchises: [],
         );
 
         final request = _withUserId(
