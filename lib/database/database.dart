@@ -30,6 +30,7 @@ import 'tables/user_social_accounts.dart';
 import 'tables/users.dart';
 
 part './daos/artists_dao.dart';
+part './daos/caption_templates_dao.dart';
 part './daos/characters_dao.dart';
 part './daos/franchises_dao.dart';
 part './daos/media_dao.dart';

@@ -17164,6 +17164,25 @@ class ArtistsDaoManager {
       $$ArtistsTableTableManager(_db.attachedDatabase, _db.artists);
 }
 
+mixin _$CaptionTemplatesDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $CaptionTemplatesTable get captionTemplates =>
+      attachedDatabase.captionTemplates;
+  CaptionTemplatesDaoManager get managers => CaptionTemplatesDaoManager(this);
+}
+
+class CaptionTemplatesDaoManager {
+  final _$CaptionTemplatesDaoMixin _db;
+  CaptionTemplatesDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$CaptionTemplatesTableTableManager get captionTemplates =>
+      $$CaptionTemplatesTableTableManager(
+        _db.attachedDatabase,
+        _db.captionTemplates,
+      );
+}
+
 mixin _$CharactersDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $FranchisesTable get franchises => attachedDatabase.franchises;
   $CharactersTable get characters => attachedDatabase.characters;
