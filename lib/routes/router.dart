@@ -1,22 +1,26 @@
-import 'package:postflow_server/routes/reference_routes.dart';
-import 'package:postflow_server/routes/user_routes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import '../handlers/artist_handler.dart';
-import '../handlers/character_handler.dart';
-import '../handlers/franchise_handler.dart';
-import '../handlers/user_handler.dart';
-import 'auth_routes.dart';
 import '../config/app_config.dart';
 import '../di.dart';
+import '../handlers/artist_handler.dart';
 import '../handlers/auth_handler.dart';
+import '../handlers/character_handler.dart';
+import '../handlers/franchise_handler.dart';
 import '../handlers/health.dart';
+import '../handlers/media_handler.dart';
+import '../handlers/posts_handler.dart';
+import '../handlers/user_handler.dart';
 import '../middlewares/auth_middleware.dart';
 import '../middlewares/error_middleware.dart';
 import '../middlewares/logging_middleware.dart';
 import '../middlewares/rate_limit_middleware.dart';
 import '../services/jwt_service.dart';
+import 'auth_routes.dart';
+import 'media_routes.dart';
+import 'posts_routes.dart';
+import 'reference_routes.dart';
+import 'user_routes.dart';
 
 // TODO: require all handler classes
 Handler buildRouter() {
@@ -27,8 +31,8 @@ Handler buildRouter() {
 
   router.mount('/api/auth/', authRouter(sl.get<AuthHandler>()).call);
   router.mount('/api/user/', userRouter(sl.get<UserHandler>()).call);
-  // router.mount('/api/posts', handler);
-  // router.mount('/api/media', handler);
+  router.mount('/api/posts', postsRouter(sl.get<PostsHandler>()).call);
+  router.mount('/api/media', mediaRouter(sl.get<MediaHandler>()).call);
   // router.mount('/api/schedules', handler);
   router.mount(
     '/api/',
