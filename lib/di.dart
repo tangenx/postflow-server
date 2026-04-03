@@ -7,11 +7,15 @@ import 'core/constants.dart';
 import 'database/database.dart';
 import 'handlers/artist_handler.dart';
 import 'handlers/auth_handler.dart';
+import 'handlers/caption_template_handler.dart';
 import 'handlers/character_handler.dart';
 import 'handlers/franchise_handler.dart';
 import 'handlers/posts_handler.dart';
+import 'handlers/social_account_target_handler.dart';
 import 'handlers/user_handler.dart';
+import 'handlers/user_social_account_hander.dart';
 import 'services/auth_service.dart';
+import 'services/caption_service.dart';
 import 'services/jwt_service.dart';
 import 'services/media_service.dart';
 import 'services/posts_service.dart';
@@ -49,6 +53,15 @@ void registerDependencies() {
   );
   sl.registerSingleton<MediaDao>(MediaDao(sl.get<PostflowDatabase>()));
   sl.registerSingleton<PostsDao>(PostsDao(sl.get<PostflowDatabase>()));
+  sl.registerSingleton<CaptionTemplatesDao>(
+    CaptionTemplatesDao(sl.get<PostflowDatabase>()),
+  );
+  sl.registerSingleton<SocialAccountTargetsDao>(
+    SocialAccountTargetsDao(sl.get<PostflowDatabase>()),
+  );
+  sl.registerSingleton<UserSocialAccountsDao>(
+    UserSocialAccountsDao(sl.get<PostflowDatabase>()),
+  );
 
   // services
   sl.registerSingleton<JwtService>(JwtService(sl.get<AppConfig>()));
@@ -76,6 +89,7 @@ void registerDependencies() {
       config: sl.get<AppConfig>(),
     ),
   );
+  sl.registerSingleton<CaptionService>(CaptionService());
   sl.registerSingleton<PostsService>(
     PostsService(
       postsDao: sl.get<PostsDao>(),
@@ -98,6 +112,14 @@ void registerDependencies() {
     FranchiseHandler(sl.get<FranchisesDao>()),
   );
   sl.registerSingleton<UserHandler>(UserHandler(sl.get<UserSettingsDao>()));
+  sl.registerSingleton<CaptionTemplateHandler>(
+    CaptionTemplateHandler(
+      captionTemplatesDao: sl.get<CaptionTemplatesDao>(),
+      captionService: sl.get<CaptionService>(),
+      postsDao: sl.get<PostsDao>(),
+      socialAccountTargetsDao: sl.get<SocialAccountTargetsDao>(),
+    ),
+  );
   sl.registerSingleton<PostsHandler>(PostsHandler(sl.get<PostsService>()));
   sl.registerSingleton<MediaHandler>(
     MediaHandler(
@@ -106,5 +128,14 @@ void registerDependencies() {
       config: sl.get<AppConfig>(),
       storageService: sl.get<StorageService>(),
     ),
+  );
+  sl.registerSingleton<SocialAccountTargetHandler>(
+    SocialAccountTargetHandler(
+      socialAccountTargetsDao: sl.get<SocialAccountTargetsDao>(),
+      accountsDao: sl.get<UserSocialAccountsDao>(),
+    ),
+  );
+  sl.registerSingleton<UserSocialAccountHandler>(
+    UserSocialAccountHandler(sl.get<UserSocialAccountsDao>()),
   );
 }
