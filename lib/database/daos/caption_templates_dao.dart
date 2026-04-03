@@ -15,7 +15,7 @@ class CaptionTemplatesDao extends DatabaseAccessor<PostflowDatabase>
         ownerId: Value(ownerId),
         name: name,
         body: body,
-        variables: Value(_parseVariables(body)),
+        variables: Value(_parseVariables(body).map((e) => e.toJson()).toList()),
       ),
     );
   }
@@ -62,13 +62,52 @@ class CaptionTemplatesDao extends DatabaseAccessor<PostflowDatabase>
     return updated.single;
   }
 
-  Future<void> deleteTemplate(UuidValue id) {
-    return (delete(captionTemplates)..where((tbl) => tbl.id.equals(id))).go();
+  Future<void> deleteTemplate(UuidValue id, UuidValue ownerId) {
+    return (delete(
+      captionTemplates,
+    )..where((tbl) => tbl.id.equals(id) & tbl.ownerId.equals(ownerId))).go();
   }
 
-  // parse variables from a template body - e.g. #{{character}} from #{{fandom}} by #{{artist}}
-  List<String> _parseVariables(String body) {
-    final matches = RegExp(r'\{\{(\w+)\}\}').allMatches(body);
-    return matches.map((m) => m.group(1)!).toSet().toList();
+  /// parse variables from a template body
+  ///
+  /// formats:
+  ///   {{variable}} —> { name: 'variable', hastag: false }
+  ///   {{#variable}} —> { name: 'variable', hastag: true }
+  ///   {{source_url:link}} —> { name: 'source_url', hastag: false, display: 'link' }
+  ///   {{#source_url:link:display}} —> { name: 'source_url', hastag: true, display: 'link' }
+  List<TemplateVariable> _parseVariables(String body) {
+    final pattern = RegExp(r'\{\{(\#?)(\w+)(?::([^}]+))?\}\}');
+
+    return pattern
+        .allMatches(body)
+        .map(
+          (m) => TemplateVariable(
+            name: m.group(2)!,
+            display: m.group(4),
+            asHashtag: m.group(1) == '#',
+          ),
+        )
+        .toList();
   }
+}
+
+class TemplateVariable {
+  final String name;
+  final String? display;
+  final bool asHashtag;
+
+  TemplateVariable({required this.name, this.display, required this.asHashtag});
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'display': display,
+    'as_hashtag': asHashtag,
+  };
+
+  factory TemplateVariable.fromJson(Map<String, dynamic> json) =>
+      TemplateVariable(
+        name: json['name'] as String,
+        display: json['display'] as String?,
+        asHashtag: json['as_hashtag'] as bool,
+      );
 }

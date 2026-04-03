@@ -15,8 +15,8 @@ class ArtistsDao extends DatabaseAccessor<PostflowDatabase>
   }) {
     final artist = ArtistsCompanion.insert(
       name: name,
-      sourceUrl: Value.absentIfNull(sourceUrl),
-      notes: Value.absentIfNull(notes),
+      sourceUrl: Value(sourceUrl),
+      notes: Value(notes),
     );
 
     return into(artists).insertReturning(artist);

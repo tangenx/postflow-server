@@ -9,7 +9,7 @@ class FranchisesDao extends DatabaseAccessor<PostflowDatabase>
   Future<Franchise> create({required String name, String? description}) {
     final franchise = FranchisesCompanion.insert(
       name: name,
-      description: Value.absentIfNull(description),
+      description: Value(description),
     );
 
     return into(franchises).insertReturning(franchise);

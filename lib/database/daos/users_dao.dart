@@ -26,10 +26,7 @@ class UsersDao extends DatabaseAccessor<PostflowDatabase> with _$UsersDaoMixin {
   }
 
   Future<User> create({required String username, String? email}) async {
-    final user = UsersCompanion.insert(
-      username: username,
-      email: Value.absentIfNull(email),
-    );
+    final user = UsersCompanion.insert(username: username, email: Value(email));
 
     await into(users).insert(user);
 

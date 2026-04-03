@@ -13,8 +13,8 @@ class CharactersDao extends DatabaseAccessor<PostflowDatabase>
   }) {
     final character = CharactersCompanion.insert(
       name: name,
-      description: Value.absentIfNull(description),
-      franchiseId: Value.absentIfNull(franchiseId),
+      description: Value(description),
+      franchiseId: Value(franchiseId),
     );
 
     return into(characters).insertReturning(character);

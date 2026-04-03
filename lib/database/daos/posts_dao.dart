@@ -13,8 +13,8 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
   }) async {
     final post = PostsCompanion.insert(
       createdBy: createdBy,
-      internalNote: Value.absentIfNull(internalNote),
-      description: Value.absentIfNull(description),
+      internalNote: Value(internalNote),
+      description: Value(description),
     );
 
     return into(posts).insertReturning(post);

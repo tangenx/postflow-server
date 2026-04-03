@@ -30,11 +30,11 @@ class MediaDao extends DatabaseAccessor<PostflowDatabase> with _$MediaDaoMixin {
       uploadedBy: userId,
       mediaTypeId: mediaTypeId,
       storageType: Value(storageType),
-      storagePath: Value.absentIfNull(storagePath),
-      sourceUrl: Value.absentIfNull(sourceUrl),
-      originalFilename: Value.absentIfNull(originalFilename),
+      storagePath: Value(storagePath),
+      sourceUrl: Value(sourceUrl),
+      originalFilename: Value(originalFilename),
       fileSizeBytes: fileSizeBytes != null
-          ? Value.absentIfNull(BigInt.from(fileSizeBytes))
+          ? Value(BigInt.from(fileSizeBytes))
           : Value.absent(),
     );
 
