@@ -17847,6 +17847,39 @@ class RefreshTokensDaoManager {
       $$RefreshTokensTableTableManager(_db.attachedDatabase, _db.refreshTokens);
 }
 
+mixin _$SocialAccountTargetsDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $SocialNetworksTable get socialNetworks => attachedDatabase.socialNetworks;
+  $UserSocialAccountsTable get userSocialAccounts =>
+      attachedDatabase.userSocialAccounts;
+  $SocialAccountTargetsTable get socialAccountTargets =>
+      attachedDatabase.socialAccountTargets;
+  SocialAccountTargetsDaoManager get managers =>
+      SocialAccountTargetsDaoManager(this);
+}
+
+class SocialAccountTargetsDaoManager {
+  final _$SocialAccountTargetsDaoMixin _db;
+  SocialAccountTargetsDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$SocialNetworksTableTableManager get socialNetworks =>
+      $$SocialNetworksTableTableManager(
+        _db.attachedDatabase,
+        _db.socialNetworks,
+      );
+  $$UserSocialAccountsTableTableManager get userSocialAccounts =>
+      $$UserSocialAccountsTableTableManager(
+        _db.attachedDatabase,
+        _db.userSocialAccounts,
+      );
+  $$SocialAccountTargetsTableTableManager get socialAccountTargets =>
+      $$SocialAccountTargetsTableTableManager(
+        _db.attachedDatabase,
+        _db.socialAccountTargets,
+      );
+}
+
 mixin _$UserSettingsDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
   $UserSettingsTable get userSettings => attachedDatabase.userSettings;
@@ -17877,6 +17910,32 @@ class UserIdentitiesDaoManager {
       $$UserIdentitiesTableTableManager(
         _db.attachedDatabase,
         _db.userIdentities,
+      );
+}
+
+mixin _$UserSocialAccountsDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $SocialNetworksTable get socialNetworks => attachedDatabase.socialNetworks;
+  $UserSocialAccountsTable get userSocialAccounts =>
+      attachedDatabase.userSocialAccounts;
+  UserSocialAccountsDaoManager get managers =>
+      UserSocialAccountsDaoManager(this);
+}
+
+class UserSocialAccountsDaoManager {
+  final _$UserSocialAccountsDaoMixin _db;
+  UserSocialAccountsDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$SocialNetworksTableTableManager get socialNetworks =>
+      $$SocialNetworksTableTableManager(
+        _db.attachedDatabase,
+        _db.socialNetworks,
+      );
+  $$UserSocialAccountsTableTableManager get userSocialAccounts =>
+      $$UserSocialAccountsTableTableManager(
+        _db.attachedDatabase,
+        _db.userSocialAccounts,
       );
 }
 
