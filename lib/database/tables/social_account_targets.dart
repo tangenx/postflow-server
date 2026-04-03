@@ -13,6 +13,8 @@ class SocialAccountTargets extends Table {
   TextColumn get targetId => text()();
   // human-readable label shown in UI, e.g. "My Art Channel"
   TextColumn get targetLabel => text().nullable()();
+  // short link for captions, e.g. "@mypostaccount" or "t.me/mychannel"
+  TextColumn get shortLink => text().nullable()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 
   @override

@@ -2715,6 +2715,17 @@ class $SocialAccountTargetsTable extends SocialAccountTargets
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _shortLinkMeta = const VerificationMeta(
+    'shortLink',
+  );
+  @override
+  late final GeneratedColumn<String> shortLink = GeneratedColumn<String>(
+    'short_link',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -2734,6 +2745,7 @@ class $SocialAccountTargetsTable extends SocialAccountTargets
     targetType,
     targetId,
     targetLabel,
+    shortLink,
     isActive,
   ];
   @override
@@ -2787,6 +2799,12 @@ class $SocialAccountTargetsTable extends SocialAccountTargets
         ),
       );
     }
+    if (data.containsKey('short_link')) {
+      context.handle(
+        _shortLinkMeta,
+        shortLink.isAcceptableOrUnknown(data['short_link']!, _shortLinkMeta),
+      );
+    }
     if (data.containsKey('is_active')) {
       context.handle(
         _isActiveMeta,
@@ -2826,6 +2844,10 @@ class $SocialAccountTargetsTable extends SocialAccountTargets
         DriftSqlType.string,
         data['${effectivePrefix}target_label'],
       ),
+      shortLink: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}short_link'],
+      ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -2846,6 +2868,7 @@ class SocialAccountTarget extends DataClass
   final String targetType;
   final String targetId;
   final String? targetLabel;
+  final String? shortLink;
   final bool isActive;
   const SocialAccountTarget({
     required this.id,
@@ -2853,6 +2876,7 @@ class SocialAccountTarget extends DataClass
     required this.targetType,
     required this.targetId,
     this.targetLabel,
+    this.shortLink,
     required this.isActive,
   });
   @override
@@ -2868,6 +2892,9 @@ class SocialAccountTarget extends DataClass
     if (!nullToAbsent || targetLabel != null) {
       map['target_label'] = Variable<String>(targetLabel);
     }
+    if (!nullToAbsent || shortLink != null) {
+      map['short_link'] = Variable<String>(shortLink);
+    }
     map['is_active'] = Variable<bool>(isActive);
     return map;
   }
@@ -2881,6 +2908,9 @@ class SocialAccountTarget extends DataClass
       targetLabel: targetLabel == null && nullToAbsent
           ? const Value.absent()
           : Value(targetLabel),
+      shortLink: shortLink == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shortLink),
       isActive: Value(isActive),
     );
   }
@@ -2898,6 +2928,7 @@ class SocialAccountTarget extends DataClass
       targetType: serializer.fromJson<String>(json['targetType']),
       targetId: serializer.fromJson<String>(json['targetId']),
       targetLabel: serializer.fromJson<String?>(json['targetLabel']),
+      shortLink: serializer.fromJson<String?>(json['shortLink']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
@@ -2910,6 +2941,7 @@ class SocialAccountTarget extends DataClass
       'targetType': serializer.toJson<String>(targetType),
       'targetId': serializer.toJson<String>(targetId),
       'targetLabel': serializer.toJson<String?>(targetLabel),
+      'shortLink': serializer.toJson<String?>(shortLink),
       'isActive': serializer.toJson<bool>(isActive),
     };
   }
@@ -2920,6 +2952,7 @@ class SocialAccountTarget extends DataClass
     String? targetType,
     String? targetId,
     Value<String?> targetLabel = const Value.absent(),
+    Value<String?> shortLink = const Value.absent(),
     bool? isActive,
   }) => SocialAccountTarget(
     id: id ?? this.id,
@@ -2927,6 +2960,7 @@ class SocialAccountTarget extends DataClass
     targetType: targetType ?? this.targetType,
     targetId: targetId ?? this.targetId,
     targetLabel: targetLabel.present ? targetLabel.value : this.targetLabel,
+    shortLink: shortLink.present ? shortLink.value : this.shortLink,
     isActive: isActive ?? this.isActive,
   );
   SocialAccountTarget copyWithCompanion(SocialAccountTargetsCompanion data) {
@@ -2942,6 +2976,7 @@ class SocialAccountTarget extends DataClass
       targetLabel: data.targetLabel.present
           ? data.targetLabel.value
           : this.targetLabel,
+      shortLink: data.shortLink.present ? data.shortLink.value : this.shortLink,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
   }
@@ -2954,6 +2989,7 @@ class SocialAccountTarget extends DataClass
           ..write('targetType: $targetType, ')
           ..write('targetId: $targetId, ')
           ..write('targetLabel: $targetLabel, ')
+          ..write('shortLink: $shortLink, ')
           ..write('isActive: $isActive')
           ..write(')'))
         .toString();
@@ -2966,6 +3002,7 @@ class SocialAccountTarget extends DataClass
     targetType,
     targetId,
     targetLabel,
+    shortLink,
     isActive,
   );
   @override
@@ -2977,6 +3014,7 @@ class SocialAccountTarget extends DataClass
           other.targetType == this.targetType &&
           other.targetId == this.targetId &&
           other.targetLabel == this.targetLabel &&
+          other.shortLink == this.shortLink &&
           other.isActive == this.isActive);
 }
 
@@ -2987,6 +3025,7 @@ class SocialAccountTargetsCompanion
   final Value<String> targetType;
   final Value<String> targetId;
   final Value<String?> targetLabel;
+  final Value<String?> shortLink;
   final Value<bool> isActive;
   final Value<int> rowid;
   const SocialAccountTargetsCompanion({
@@ -2995,6 +3034,7 @@ class SocialAccountTargetsCompanion
     this.targetType = const Value.absent(),
     this.targetId = const Value.absent(),
     this.targetLabel = const Value.absent(),
+    this.shortLink = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -3004,6 +3044,7 @@ class SocialAccountTargetsCompanion
     required String targetType,
     required String targetId,
     this.targetLabel = const Value.absent(),
+    this.shortLink = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : userSocialAccountId = Value(userSocialAccountId),
@@ -3015,6 +3056,7 @@ class SocialAccountTargetsCompanion
     Expression<String>? targetType,
     Expression<String>? targetId,
     Expression<String>? targetLabel,
+    Expression<String>? shortLink,
     Expression<bool>? isActive,
     Expression<int>? rowid,
   }) {
@@ -3025,6 +3067,7 @@ class SocialAccountTargetsCompanion
       if (targetType != null) 'target_type': targetType,
       if (targetId != null) 'target_id': targetId,
       if (targetLabel != null) 'target_label': targetLabel,
+      if (shortLink != null) 'short_link': shortLink,
       if (isActive != null) 'is_active': isActive,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3036,6 +3079,7 @@ class SocialAccountTargetsCompanion
     Value<String>? targetType,
     Value<String>? targetId,
     Value<String?>? targetLabel,
+    Value<String?>? shortLink,
     Value<bool>? isActive,
     Value<int>? rowid,
   }) {
@@ -3045,6 +3089,7 @@ class SocialAccountTargetsCompanion
       targetType: targetType ?? this.targetType,
       targetId: targetId ?? this.targetId,
       targetLabel: targetLabel ?? this.targetLabel,
+      shortLink: shortLink ?? this.shortLink,
       isActive: isActive ?? this.isActive,
       rowid: rowid ?? this.rowid,
     );
@@ -3071,6 +3116,9 @@ class SocialAccountTargetsCompanion
     if (targetLabel.present) {
       map['target_label'] = Variable<String>(targetLabel.value);
     }
+    if (shortLink.present) {
+      map['short_link'] = Variable<String>(shortLink.value);
+    }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
@@ -3088,6 +3136,7 @@ class SocialAccountTargetsCompanion
           ..write('targetType: $targetType, ')
           ..write('targetId: $targetId, ')
           ..write('targetLabel: $targetLabel, ')
+          ..write('shortLink: $shortLink, ')
           ..write('isActive: $isActive, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -11252,6 +11301,7 @@ typedef $$SocialAccountTargetsTableCreateCompanionBuilder =
       required String targetType,
       required String targetId,
       Value<String?> targetLabel,
+      Value<String?> shortLink,
       Value<bool> isActive,
       Value<int> rowid,
     });
@@ -11262,6 +11312,7 @@ typedef $$SocialAccountTargetsTableUpdateCompanionBuilder =
       Value<String> targetType,
       Value<String> targetId,
       Value<String?> targetLabel,
+      Value<String?> shortLink,
       Value<bool> isActive,
       Value<int> rowid,
     });
@@ -11356,6 +11407,11 @@ class $$SocialAccountTargetsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get shortLink => $composableBuilder(
+    column: $table.shortLink,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<bool> get isActive => $composableBuilder(
     column: $table.isActive,
     builder: (column) => ColumnFilters(column),
@@ -11439,6 +11495,11 @@ class $$SocialAccountTargetsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get shortLink => $composableBuilder(
+    column: $table.shortLink,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isActive => $composableBuilder(
     column: $table.isActive,
     builder: (column) => ColumnOrderings(column),
@@ -11492,6 +11553,9 @@ class $$SocialAccountTargetsTableAnnotationComposer
     column: $table.targetLabel,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get shortLink =>
+      $composableBuilder(column: $table.shortLink, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -11590,6 +11654,7 @@ class $$SocialAccountTargetsTableTableManager
                 Value<String> targetType = const Value.absent(),
                 Value<String> targetId = const Value.absent(),
                 Value<String?> targetLabel = const Value.absent(),
+                Value<String?> shortLink = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SocialAccountTargetsCompanion(
@@ -11598,6 +11663,7 @@ class $$SocialAccountTargetsTableTableManager
                 targetType: targetType,
                 targetId: targetId,
                 targetLabel: targetLabel,
+                shortLink: shortLink,
                 isActive: isActive,
                 rowid: rowid,
               ),
@@ -11608,6 +11674,7 @@ class $$SocialAccountTargetsTableTableManager
                 required String targetType,
                 required String targetId,
                 Value<String?> targetLabel = const Value.absent(),
+                Value<String?> shortLink = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SocialAccountTargetsCompanion.insert(
@@ -11616,6 +11683,7 @@ class $$SocialAccountTargetsTableTableManager
                 targetType: targetType,
                 targetId: targetId,
                 targetLabel: targetLabel,
+                shortLink: shortLink,
                 isActive: isActive,
                 rowid: rowid,
               ),

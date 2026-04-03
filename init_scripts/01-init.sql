@@ -94,6 +94,8 @@ CREATE TABLE social_account_targets (
     target_id             TEXT    NOT NULL,
     -- human-readable label shown in UI, e.g. "My Art Channel"
     target_label          TEXT,
+    -- short link for captions, e.g. "@mypostaccount" or "t.me/mychannel"
+    short_link            TEXT,
     is_active             BOOLEAN NOT NULL DEFAULT TRUE,
  
     UNIQUE (user_social_account_id, target_id)
