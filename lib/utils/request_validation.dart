@@ -77,7 +77,7 @@ class RequestValidation {
   }
 
   static int optionalPositiveInt(
-    Map<String, String> query,
+    Map<String, dynamic> query,
     String key, {
     int fallback = 10,
     int min = 1,
@@ -99,5 +99,43 @@ class RequestValidation {
     }
 
     return parsed;
+  }
+
+  static bool? optionalBool(Map<String, dynamic> query, String key) {
+    final raw = query[key];
+    if (raw == null) {
+      return null;
+    }
+
+    final parsed = bool.tryParse(raw);
+    if (parsed == null) {
+      throw ValidationException('Query parameter "$key" must be a boolean');
+    }
+
+    return parsed;
+  }
+
+  // handy validators
+  // TODO: optionalEmail
+  // static String optionalEmail(Map<String, String> query, String key) {}
+
+  static String requiredSocialAccountTargetType(
+    Map<String, dynamic> query,
+    String key,
+  ) {
+    // 'user', 'group', 'channel', 'chat'
+    final raw = query[key];
+    if (raw == null) {
+      throw ValidationException('Query parameter "$key" is required');
+    }
+
+    final normalized = raw.trim().toLowerCase();
+    if (!['user', 'group', 'channel', 'chat'].contains(normalized)) {
+      throw ValidationException(
+        'Query parameter "$key" must be one of "user", "group", "channel", "chat"',
+      );
+    }
+
+    return normalized;
   }
 }
