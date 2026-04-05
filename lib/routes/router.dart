@@ -11,6 +11,7 @@ import '../handlers/franchise_handler.dart';
 import '../handlers/health.dart';
 import '../handlers/media_handler.dart';
 import '../handlers/posts_handler.dart';
+import '../handlers/schedule_handler.dart';
 import '../handlers/social_account_target_handler.dart';
 import '../handlers/user_handler.dart';
 import '../handlers/user_social_account_hander.dart';
@@ -24,6 +25,7 @@ import 'caption_template_routes.dart';
 import 'media_routes.dart';
 import 'posts_routes.dart';
 import 'reference_routes.dart';
+import 'schedule_routes.dart';
 import 'social_account_target_router.dart';
 import 'user_routes.dart';
 
@@ -48,7 +50,10 @@ Handler buildRouter() {
       sl.get<UserSocialAccountHandler>(),
     ).call,
   );
-  // router.mount('/api/schedules', handler);
+  router.mount(
+    '/api/schedules/',
+    scheduleRoutes(sl.get<ScheduleHandler>()).call,
+  );
   router.mount(
     '/api/',
     referenceRouter(

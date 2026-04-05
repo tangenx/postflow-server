@@ -174,15 +174,15 @@ class CreateScheduleRequest {
   factory CreateScheduleRequest.fromJson(Map<String, dynamic> json) {
     return CreateScheduleRequest(
       socialAccountTargetId: UuidValue.withValidation(
-        json['social_account_target_id'] as String,
+        json['socialAccountTargetId'] as String,
       ),
-      scheduledAt: DateTime.parse(json['scheduled_at'] as String).toUtc(),
-      templateId: json['template_id'] != null
-          ? UuidValue.withValidation(json['template_id'] as String)
+      scheduledAt: DateTime.parse(json['scheduledAt'] as String).toUtc(),
+      templateId: json['templateId'] != null
+          ? UuidValue.withValidation(json['templateId'] as String)
           : null,
-      captionBody: json['caption_body'] as String?,
+      captionBody: json['captionBody'] as String?,
       templateVariables:
-          json['template_variables'] as Map<String, dynamic>? ?? {},
+          json['templateVariables'] as Map<String, dynamic>? ?? {},
     );
   }
 }

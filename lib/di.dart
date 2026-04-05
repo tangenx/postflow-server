@@ -1,6 +1,5 @@
 import 'package:dotenv/dotenv.dart';
 import 'package:get_it/get_it.dart';
-import 'package:postflow_server/handlers/media_handler.dart';
 
 import 'config/app_config.dart';
 import 'core/constants.dart';
@@ -10,7 +9,9 @@ import 'handlers/auth_handler.dart';
 import 'handlers/caption_template_handler.dart';
 import 'handlers/character_handler.dart';
 import 'handlers/franchise_handler.dart';
+import 'handlers/media_handler.dart';
 import 'handlers/posts_handler.dart';
+import 'handlers/schedule_handler.dart';
 import 'handlers/social_account_target_handler.dart';
 import 'handlers/user_handler.dart';
 import 'handlers/user_social_account_hander.dart';
@@ -19,6 +20,7 @@ import 'services/caption_service.dart';
 import 'services/jwt_service.dart';
 import 'services/media_service.dart';
 import 'services/posts_service.dart';
+import 'services/schedule_service.dart';
 import 'services/storage/local_storage_service.dart';
 import 'services/storage/remote_storage_service.dart';
 import 'services/storage/s3_storage_service.dart';
@@ -62,6 +64,7 @@ void registerDependencies() {
   sl.registerSingleton<UserSocialAccountsDao>(
     UserSocialAccountsDao(sl.get<PostflowDatabase>()),
   );
+  sl.registerSingleton<ScheduleDao>(ScheduleDao(sl.get<PostflowDatabase>()));
 
   // services
   sl.registerSingleton<JwtService>(JwtService(sl.get<AppConfig>()));
@@ -97,6 +100,16 @@ void registerDependencies() {
       charactersDao: sl.get<CharactersDao>(),
       franchisesDao: sl.get<FranchisesDao>(),
       db: sl.get<PostflowDatabase>(),
+    ),
+  );
+  sl.registerSingleton<ScheduleService>(
+    ScheduleService(
+      scheduleDao: sl.get<ScheduleDao>(),
+      postsDao: sl.get<PostsDao>(),
+      db: sl.get<PostflowDatabase>(),
+      socialAccountTargetsDao: sl.get<SocialAccountTargetsDao>(),
+      captionService: sl.get<CaptionService>(),
+      captionTemplatesDao: sl.get<CaptionTemplatesDao>(),
     ),
   );
 
@@ -137,5 +150,8 @@ void registerDependencies() {
   );
   sl.registerSingleton<UserSocialAccountHandler>(
     UserSocialAccountHandler(sl.get<UserSocialAccountsDao>()),
+  );
+  sl.registerSingleton<ScheduleHandler>(
+    ScheduleHandler(sl.get<ScheduleService>()),
   );
 }
