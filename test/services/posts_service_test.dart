@@ -84,6 +84,14 @@ class FakePostsDao implements PostsDao {
   }
 
   @override
+  Future<void> attachPostFranchises({
+    required UuidValue postId,
+    required List<UuidValue> franchiseIds,
+  }) async {
+    attachedFranchiseIds = franchiseIds;
+  }
+
+  @override
   Future<PostWithRelations?> findPostWithRelationsById(
     UuidValue id,
     UuidValue userId,
