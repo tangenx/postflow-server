@@ -46,7 +46,7 @@ class FakeSocialAccountTargetsDao implements SocialAccountTargetsDao {
   }) async {
     _maybeThrow();
     final target = SocialAccountTarget(
-      id: UuidValue.fromString('33333333-3333-3333-3333-333333333333'),
+      id: UuidValue.fromString('33333333-3333-4333-8333-333333333333'),
       userSocialAccountId: userSocialAccountId,
       targetType: targetType,
       targetId: targetId,
@@ -115,9 +115,9 @@ class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const _userId = '11111111-1111-1111-1111-111111111111';
-const _accountId = '22222222-2222-2222-2222-222222222222';
-const _targetId = '33333333-3333-3333-3333-333333333333';
+const _userId = '11111111-1111-4111-8111-111111111111';
+const _accountId = '22222222-2222-4222-8222-222222222222';
+const _targetId = '33333333-3333-4333-8333-333333333333';
 
 final _testTarget = SocialAccountTarget(
   id: UuidValue.fromString(_targetId),
@@ -134,7 +134,7 @@ final _testTargets = [_testTarget];
 final _ownedAccount = UserSocialAccount(
   id: UuidValue.fromString(_accountId),
   userId: UuidValue.fromString(_userId),
-  socialNetworkId: UuidValue.fromString('44444444-4444-4444-4444-444444444444'),
+  socialNetworkId: UuidValue.fromString('44444444-4444-4444-8444-444444444444'),
   externalAccountId: 'ext-123',
   isActive: true,
   createdAt: PgDateTime(DateTime.utc(2024)),
@@ -149,7 +149,7 @@ Request _mockRequest({
   final request = Request(
     'GET',
     uri,
-    body: body != null ? Stream.value(body) : null,
+    body: body,
     headers: body != null ? {'content-type': 'application/json'} : {},
   );
   if (userId != null) {

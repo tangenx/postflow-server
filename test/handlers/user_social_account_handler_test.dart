@@ -55,7 +55,7 @@ class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
   }) async {
     _maybeThrow();
     final account = UserSocialAccount(
-      id: UuidValue.fromString('33333333-3333-3333-3333-333333333333'),
+      id: UuidValue.fromString('33333333-3333-4333-8333-333333333333'),
       userId: userId,
       socialNetworkId: socialNetworkId,
       externalAccountId: externalAccountId,
@@ -97,9 +97,9 @@ class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const _userId = '11111111-1111-1111-1111-111111111111';
-const _socialNetworkId = '22222222-2222-2222-2222-222222222222';
-const _accountId = '33333333-3333-3333-3333-333333333333';
+const _userId = '11111111-1111-4111-8111-111111111111';
+const _socialNetworkId = '22222222-2222-4222-8222-222222222222';
+const _accountId = '33333333-3333-4333-8333-333333333333';
 const _externalAccountId = '1234567890';
 const _screenName = 'testuser';
 
@@ -134,7 +134,7 @@ Request _mockRequest({UuidValue? userId, String? body, String method = 'GET'}) {
   final request = Request(
     method,
     uri,
-    body: body != null ? Stream.value(body) : null,
+    body: body,
     headers: body != null ? {'content-type': 'application/json'} : {},
   );
   if (userId != null) {
@@ -240,7 +240,7 @@ void main() {
 
       test('returns 404 for different user\'s account', () async {
         fakeDao.findByIdAndUserResult = null;
-        final otherUserId = '99999999-9999-9999-9999-999999999999';
+        final otherUserId = '99999999-9999-4999-8999-999999999999';
         final request = _mockRequest(userId: UuidValue.fromString(otherUserId));
 
         final response = await handler.getAccount(request, _accountId);
@@ -285,7 +285,7 @@ void main() {
           'screenName': _screenName,
         }).change(context: {'userId': UuidValue.fromString(_userId)});
 
-        expect(() => handler.create(request), throwsA(isA<FormatException>()));
+        expect(() => handler.create(request), throwsA(isA<TypeError>()));
       });
 
       test('returns 400 for invalid UUID in socialNetworkId', () async {
@@ -313,7 +313,7 @@ void main() {
         final request = Request(
           'POST',
           Uri.parse('http://localhost/api/social-accounts'),
-          body: Stream.value('not json'),
+          body: 'not json',
           headers: {'content-type': 'application/json'},
         ).change(context: {'userId': UuidValue.fromString(_userId)});
 
