@@ -212,16 +212,16 @@ class CreatePostRequest {
     return CreatePostRequest(
       internalNote: json['internal_note'] as String?,
       description: json['description'] as String?,
-      media: (json['media'] as List<dynamic>)
+      media: (json['media'] as List<dynamic>? ?? [])
           .map((m) => UuidValue.withValidation(m as String))
           .toList(),
-      artists: (json['artists'] as List<dynamic>)
+      artists: (json['artists'] as List<dynamic>? ?? [])
           .map((a) => ArtistRef.fromJson(a as Map<String, dynamic>))
           .toList(),
-      characters: (json['characters'] as List<dynamic>)
+      characters: (json['characters'] as List<dynamic>? ?? [])
           .map((c) => CharacterRef.fromJson(c as Map<String, dynamic>))
           .toList(),
-      franchises: (json['franchises'] as List<dynamic>)
+      franchises: (json['franchises'] as List<dynamic>? ?? [])
           .map((f) => FranchiseRef.fromJson(f as Map<String, dynamic>))
           .toList(),
     );
