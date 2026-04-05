@@ -17847,6 +17847,54 @@ class RefreshTokensDaoManager {
       $$RefreshTokensTableTableManager(_db.attachedDatabase, _db.refreshTokens);
 }
 
+mixin _$ScheduleDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $UsersTable get users => attachedDatabase.users;
+  $PostsTable get posts => attachedDatabase.posts;
+  $SocialNetworksTable get socialNetworks => attachedDatabase.socialNetworks;
+  $UserSocialAccountsTable get userSocialAccounts =>
+      attachedDatabase.userSocialAccounts;
+  $SocialAccountTargetsTable get socialAccountTargets =>
+      attachedDatabase.socialAccountTargets;
+  $PostSchedulesTable get postSchedules => attachedDatabase.postSchedules;
+  $CaptionTemplatesTable get captionTemplates =>
+      attachedDatabase.captionTemplates;
+  $PostCaptionsTable get postCaptions => attachedDatabase.postCaptions;
+  ScheduleDaoManager get managers => ScheduleDaoManager(this);
+}
+
+class ScheduleDaoManager {
+  final _$ScheduleDaoMixin _db;
+  ScheduleDaoManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$PostsTableTableManager get posts =>
+      $$PostsTableTableManager(_db.attachedDatabase, _db.posts);
+  $$SocialNetworksTableTableManager get socialNetworks =>
+      $$SocialNetworksTableTableManager(
+        _db.attachedDatabase,
+        _db.socialNetworks,
+      );
+  $$UserSocialAccountsTableTableManager get userSocialAccounts =>
+      $$UserSocialAccountsTableTableManager(
+        _db.attachedDatabase,
+        _db.userSocialAccounts,
+      );
+  $$SocialAccountTargetsTableTableManager get socialAccountTargets =>
+      $$SocialAccountTargetsTableTableManager(
+        _db.attachedDatabase,
+        _db.socialAccountTargets,
+      );
+  $$PostSchedulesTableTableManager get postSchedules =>
+      $$PostSchedulesTableTableManager(_db.attachedDatabase, _db.postSchedules);
+  $$CaptionTemplatesTableTableManager get captionTemplates =>
+      $$CaptionTemplatesTableTableManager(
+        _db.attachedDatabase,
+        _db.captionTemplates,
+      );
+  $$PostCaptionsTableTableManager get postCaptions =>
+      $$PostCaptionsTableTableManager(_db.attachedDatabase, _db.postCaptions);
+}
+
 mixin _$SocialAccountTargetsDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
   $SocialNetworksTable get socialNetworks => attachedDatabase.socialNetworks;
