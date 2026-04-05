@@ -301,8 +301,8 @@ void main() {
         );
 
         final request = _withUserId(_jsonPost('api/media/remote', {
-          'source_url': 'https://example.com/img.png',
-          'content_type': 'image/png',
+          'sourceUrl': 'https://example.com/img.png',
+          'contentType': 'image/png',
         }));
 
         final response = await handler.saveRemote(request);
@@ -313,9 +313,9 @@ void main() {
         expect(body['data'], isNotNull);
       });
 
-      test('throws ValidationException when source_url missing', () async {
+      test('throws ValidationException when sourceUrl missing', () async {
         final request = _withUserId(_jsonPost('api/media/remote', {
-          'content_type': 'image/png',
+          'contentType': 'image/png',
         }));
 
         expect(

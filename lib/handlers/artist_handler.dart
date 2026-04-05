@@ -53,7 +53,7 @@ class ArtistHandler {
     );
     final sourceUrl = RequestValidation.optionalString(
       data,
-      'source_url',
+      'sourceUrl',
       maxLength: 2048,
     );
     final notes = RequestValidation.optionalString(
@@ -80,7 +80,7 @@ class ArtistHandler {
     final name = RequestValidation.optionalString(data, 'name', maxLength: 255);
     final sourceUrl = RequestValidation.optionalString(
       data,
-      'source_url',
+      'sourceUrl',
       maxLength: 2048,
     );
     final notes = RequestValidation.optionalString(

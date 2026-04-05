@@ -80,10 +80,10 @@ class MediaHandler {
       await request.readAsString(),
     );
 
-    final sourceUrl = RequestValidation.requiredString(data, 'source_url');
+    final sourceUrl = RequestValidation.requiredString(data, 'sourceUrl');
     String? contentType = RequestValidation.optionalString(
       data,
-      'content_type',
+      'contentType',
     );
 
     contentType ??= await _detectContentType(sourceUrl);

@@ -29,7 +29,7 @@ class UserHandler {
     );
     final saucenaoApiKey = RequestValidation.optionalString(
       data,
-      'saucenao_api_key',
+      'saucenaoApiKey',
       maxLength: 512,
     );
 

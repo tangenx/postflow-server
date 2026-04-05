@@ -261,7 +261,7 @@ void main() {
     group('create', () {
       test('returns 200 with created character', () async {
         final request = _jsonPost('characters', {
-          'franchise_id': _franchiseId,
+          'franchiseId': _franchiseId,
           'name': 'Luka',
           'description': 'Vocaloid',
         });
@@ -276,7 +276,7 @@ void main() {
 
       test('works with null description', () async {
         final request = _jsonPost('characters', {
-          'franchise_id': _franchiseId,
+          'franchiseId': _franchiseId,
           'name': 'Kaito',
         });
 
@@ -287,9 +287,9 @@ void main() {
         expect(body['data']['name'], equals('Kaito'));
       });
 
-      test('throws FormatException for invalid franchise_id', () {
+      test('throws FormatException for invalid franchiseId', () {
         final request = _jsonPost('characters', {
-          'franchise_id': 'not-a-uuid',
+          'franchiseId': 'not-a-uuid',
           'name': 'Broken',
         });
 
@@ -311,10 +311,10 @@ void main() {
         expect(body['data']['name'], equals('Miku Updated'));
       });
 
-      test('allows updating franchise_id', () async {
+      test('allows updating franchiseId', () async {
         const newFranchise = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
         final request = _jsonPut('characters/$_charId1', {
-          'franchise_id': newFranchise,
+          'franchiseId': newFranchise,
           'name': 'Miku',
         });
 
@@ -323,7 +323,7 @@ void main() {
         expect(response.statusCode, equals(200));
       });
 
-      test('handles null franchise_id in body', () async {
+      test('handles null franchiseId in body', () async {
         final request = _jsonPut('characters/$_charId1', {'name': 'Miku'});
 
         final response = await handler.update(request, _charId1);

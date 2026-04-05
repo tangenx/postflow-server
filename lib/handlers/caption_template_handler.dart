@@ -120,14 +120,14 @@ class CaptionTemplateHandler {
     }
 
     final socialAccountTarget = await _socialAccountTargetsDao.findById(
-      UuidValue.withValidation(body['target_id']),
+      UuidValue.withValidation(body['targetId']),
     );
     if (socialAccountTarget == null) {
       return ApiResponse.error(404, 'NOT_FOUND', 'Target not found');
     }
 
     final post = await _postsDao.findPostWithRelationsById(
-      UuidValue.withValidation(body['post_id']),
+      UuidValue.withValidation(body['postId']),
       userId,
     );
     if (post == null) {

@@ -49,7 +49,7 @@ class CharacterHandler {
     );
     final franchiseIdRaw = RequestValidation.optionalString(
       data,
-      'franchise_id',
+      'franchiseId',
       maxLength: 64,
     );
     final name = RequestValidation.requiredString(
@@ -83,7 +83,7 @@ class CharacterHandler {
     );
     final franchiseIdRaw = RequestValidation.optionalString(
       data,
-      'franchise_id',
+      'franchiseId',
       maxLength: 64,
     );
     final name = RequestValidation.optionalString(data, 'name', maxLength: 255);

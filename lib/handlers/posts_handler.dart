@@ -10,7 +10,7 @@ class PostsHandler {
 
   PostsHandler(this._postsService);
 
-  /// GET /api/posts?page=1&page_size=10
+  /// GET /api/posts?page=1&pageSize=10
   Future<Response> getPosts(Request request) async {
     final userId = request.context['userId'] as UuidValue;
     final page = RequestValidation.optionalPositiveInt(
@@ -21,7 +21,7 @@ class PostsHandler {
     );
     final pageSize = RequestValidation.optionalPositiveInt(
       request.url.queryParameters,
-      'page_size',
+      'pageSize',
       fallback: 10,
       max: 100,
     );
@@ -48,7 +48,7 @@ class PostsHandler {
     );
 
     RequestValidation.optionalString(data, 'description', maxLength: 4000);
-    RequestValidation.optionalString(data, 'internal_note', maxLength: 4000);
+    RequestValidation.optionalString(data, 'internalNote', maxLength: 4000);
 
     final post = await _postsService.createPost(
       userId: userId,
@@ -76,7 +76,7 @@ class PostsHandler {
     );
 
     RequestValidation.optionalString(data, 'description', maxLength: 4000);
-    RequestValidation.optionalString(data, 'internal_note', maxLength: 4000);
+    RequestValidation.optionalString(data, 'internalNote', maxLength: 4000);
 
     final post = await _postsService.updatePost(
       userId: userId,

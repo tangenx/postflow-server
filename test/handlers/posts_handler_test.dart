@@ -167,7 +167,7 @@ void main() {
 
         final request = Request(
           'GET',
-          Uri.parse('http://localhost/api/posts?page=1&page_size=10'),
+          Uri.parse('http://localhost/api/posts?page=1&pageSize=10'),
         ).change(context: {'userId': UuidValue.fromString(_userId)});
 
         final response = await handler.getPosts(request);
@@ -177,7 +177,7 @@ void main() {
         expect(body['ok'], isTrue);
         expect(body['data'], hasLength(1));
         expect(body['meta']['page'], equals(1));
-        expect(body['meta']['page_size'], equals(10));
+        expect(body['meta']['pageSize'], equals(10));
         expect(body['meta']['total'], equals(1));
       });
 
@@ -195,7 +195,7 @@ void main() {
         expect(response.statusCode, equals(200));
         final body = jsonDecode(await response.readAsString());
         expect(body['meta']['page'], equals(1));
-        expect(body['meta']['page_size'], equals(10));
+        expect(body['meta']['pageSize'], equals(10));
       });
 
       test('returns empty list when no posts', () async {
@@ -223,7 +223,7 @@ void main() {
         final request = _withUserId(
           _jsonRequest('POST', 'api/posts', {
             'description': 'test',
-            'internal_note': 'note',
+            'internalNote': 'note',
             'media': [_mediaId],
             'artists': [
               {'id': _artistId},

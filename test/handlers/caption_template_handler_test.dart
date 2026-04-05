@@ -274,7 +274,7 @@ void main() {
 
         final request = _withUserId(_jsonPost(
           'api/caption-templates/$_templateId/preview',
-          {'post_id': '00000000-0000-0000-0000-000000000000', 'target_id': '00000000-0000-0000-0000-000000000000', 'overrides': '{}'},
+          {'postId': '00000000-0000-0000-0000-000000000000', 'targetId': '00000000-0000-0000-0000-000000000000', 'overrides': '{}'},
         ));
 
         final response = await handler.render(request, _templateId);
@@ -288,7 +288,7 @@ void main() {
 
         final request = _withUserId(_jsonPost(
           'api/caption-templates/$_templateId/preview',
-          {'post_id': '00000000-0000-0000-0000-000000000000', 'target_id': '00000000-0000-0000-0000-000000000000', 'overrides': '{}'},
+          {'postId': '00000000-0000-0000-0000-000000000000', 'targetId': '00000000-0000-0000-0000-000000000000', 'overrides': '{}'},
         ));
 
         final response = await handler.render(request, _templateId);
@@ -311,7 +311,7 @@ void main() {
 
         final request = _withUserId(_jsonPost(
           'api/caption-templates/$_templateId/preview',
-          {'post_id': '00000000-0000-0000-0000-000000000000', 'target_id': '00000000-0000-0000-0000-000000000000', 'overrides': '{}'},
+          {'postId': '00000000-0000-0000-0000-000000000000', 'targetId': '00000000-0000-0000-0000-000000000000', 'overrides': '{}'},
         ));
 
         final response = await handler.render(request, _templateId);

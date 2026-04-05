@@ -101,13 +101,13 @@ class TemplateVariable {
   Map<String, dynamic> toJson() => {
     'name': name,
     'display': display,
-    'as_hashtag': asHashtag,
+    'asHashtag': asHashtag,
   };
 
   factory TemplateVariable.fromJson(Map<String, dynamic> json) =>
       TemplateVariable(
         name: json['name'] as String,
         display: json['display'] as String?,
-        asHashtag: json['as_hashtag'] as bool,
+        asHashtag: json['asHashtag'] as bool,
       );
 }

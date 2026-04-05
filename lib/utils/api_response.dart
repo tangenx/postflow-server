@@ -41,9 +41,9 @@ class ApiResponse {
         'data': data,
         'meta': {
           'page': page,
-          'page_size': pageSize,
+          'pageSize': pageSize,
           'total': total,
-          'total_pages': (total / pageSize).ceil(),
+          'totalPages': (total / pageSize).ceil(),
         },
       }, toEncodable: _toEncodable),
       headers: {'content-type': 'application/json'},

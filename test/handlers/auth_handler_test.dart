@@ -93,8 +93,8 @@ void main() {
         expect(response.statusCode, equals(200));
         final body = jsonDecode(await response.readAsString());
         expect(body['ok'], isTrue);
-        expect(body['data']['access_token'], equals('access-token-123'));
-        expect(body['data']['refresh_token'], equals('refresh-token-456'));
+        expect(body['data']['accessToken'], equals('access-token-123'));
+        expect(body['data']['refreshToken'], equals('refresh-token-456'));
       });
 
       test('sets refresh_token cookie with HttpOnly', () async {
@@ -146,8 +146,8 @@ void main() {
         expect(response.statusCode, equals(200));
         final body = jsonDecode(await response.readAsString());
         expect(body['ok'], isTrue);
-        expect(body['data']['access_token'], equals('access-token-123'));
-        expect(body['data']['refresh_token'], equals('refresh-token-456'));
+        expect(body['data']['accessToken'], equals('access-token-123'));
+        expect(body['data']['refreshToken'], equals('refresh-token-456'));
       });
 
       test('sets refresh_token cookie', () async {
@@ -176,12 +176,12 @@ void main() {
 
         expect(response.statusCode, equals(200));
         final body = jsonDecode(await response.readAsString());
-        expect(body['data']['access_token'], equals('access-token-123'));
+        expect(body['data']['accessToken'], equals('access-token-123'));
       });
 
       test('reads refresh token from body when cookie missing', () async {
         final request = _jsonPost('api/auth/refresh', {
-          'refresh_token': 'body-token-value',
+          'refreshToken': 'body-token-value',
         });
 
         final response = await handler.refresh(request);
@@ -193,7 +193,7 @@ void main() {
         final request = Request(
           'POST',
           Uri.parse('http://localhost/api/auth/refresh'),
-          body: jsonEncode({'refresh_token': 'body-token'}),
+          body: jsonEncode({'refreshToken': 'body-token'}),
           headers: {
             'cookie': 'refresh_token=cookie-token',
             'content-type': 'application/json',
@@ -230,7 +230,7 @@ void main() {
 
       test('reads refresh token from body', () async {
         final request = _jsonPost('api/auth/logout', {
-          'refresh_token': 'body-token',
+          'refreshToken': 'body-token',
         });
 
         final response = await handler.logout(request);

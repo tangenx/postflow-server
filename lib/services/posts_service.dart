@@ -210,7 +210,7 @@ class CreatePostRequest {
 
   factory CreatePostRequest.fromJson(Map<String, dynamic> json) {
     return CreatePostRequest(
-      internalNote: json['internal_note'] as String?,
+      internalNote: json['internalNote'] as String?,
       description: json['description'] as String?,
       media: (json['media'] as List<dynamic>? ?? [])
           .map((m) => UuidValue.withValidation(m as String))
@@ -249,13 +249,13 @@ class UpdatePostRequest {
 
   factory UpdatePostRequest.fromJson(Map<String, dynamic> json) {
     return UpdatePostRequest(
-      internalNote: json['internal_note'] as String?,
+      internalNote: json['internalNote'] as String?,
       description: json['description'] as String?,
       status: json['status'] != null
           ? PostStatus.values.byName(json['status'] as String)
           : null,
-      mediaIds: json['media_ids'] != null
-          ? (json['media_ids'] as List)
+      mediaIds: json['mediaIds'] != null
+          ? (json['mediaIds'] as List)
                 .map((id) => UuidValue.withValidation(id as String))
                 .toList()
           : null,
@@ -291,7 +291,7 @@ class ArtistRef {
           ? UuidValue.withValidation(json['id'] as String)
           : null,
       name: json['name'] as String?,
-      sourceUrl: json['source_url'] as String?,
+      sourceUrl: json['sourceUrl'] as String?,
     );
   }
 }
@@ -309,8 +309,8 @@ class CharacterRef {
           ? UuidValue.withValidation(json['id'] as String)
           : null,
       name: json['name'] as String?,
-      franchiseId: json['franchise_id'] != null
-          ? UuidValue.withValidation(json['franchise_id'] as String)
+      franchiseId: json['franchiseId'] != null
+          ? UuidValue.withValidation(json['franchiseId'] as String)
           : null,
     );
   }

@@ -261,7 +261,7 @@ void main() {
       test('returns 200 with created artist', () async {
         final request = _jsonPost('artists', {
           'name': 'Charlie',
-          'source_url': 'https://example.com/charlie',
+          'sourceUrl': 'https://example.com/charlie',
           'notes': 'New artist',
         });
 

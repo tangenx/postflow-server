@@ -76,7 +76,7 @@ class AuthHandler {
       final data = RequestValidation.parseJsonObject(
         await request.readAsString(),
       );
-      refreshToken = RequestValidation.optionalString(data, 'refresh_token');
+      refreshToken = RequestValidation.optionalString(data, 'refreshToken');
     }
 
     if (refreshToken == null) {
@@ -96,7 +96,7 @@ class AuthHandler {
       final data = RequestValidation.parseJsonObject(
         await request.readAsString(),
       );
-      refreshToken = RequestValidation.optionalString(data, 'refresh_token');
+      refreshToken = RequestValidation.optionalString(data, 'refreshToken');
     }
 
     if (refreshToken == null) {
@@ -117,8 +117,8 @@ class AuthHandler {
   Response _authResponse(AuthData authData) {
     return ApiResponse.ok(
       {
-        'access_token': authData.accessToken,
-        'refresh_token': authData.refreshToken,
+        'accessToken': authData.accessToken,
+        'refreshToken': authData.refreshToken,
       },
       headers: {
         "set-cookie": [

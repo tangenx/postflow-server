@@ -283,11 +283,11 @@ class PostWithRelations {
   Map<String, dynamic> toJson() {
     return {
       'id': post.id.toString(),
-      'internal_note': post.internalNote,
+      'internalNote': post.internalNote,
       'description': post.description,
       'status': post.status.name,
-      'created_at': post.createdAt.dateTime.toIso8601String(),
-      'updated_at': post.updatedAt.dateTime.toIso8601String(),
+      'createdAt': post.createdAt.dateTime.toIso8601String(),
+      'updatedAt': post.updatedAt.dateTime.toIso8601String(),
       'media': media.map((m) => m.toJson()).toList(),
       'artists': artists.map((a) => a.toJson()).toList(),
       'characters': characters.map((c) => c.toJson()).toList(),
