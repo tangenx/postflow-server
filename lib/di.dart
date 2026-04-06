@@ -1,6 +1,7 @@
 import 'package:dotenv/dotenv.dart';
 import 'package:get_it/get_it.dart';
 
+import 'adapters/adapter_registry.dart';
 import 'config/app_config.dart';
 import 'core/constants.dart';
 import 'database/database.dart';
@@ -154,4 +155,8 @@ void registerDependencies() {
   sl.registerSingleton<ScheduleHandler>(
     ScheduleHandler(sl.get<ScheduleService>()),
   );
+
+  // adapters
+  final adapterRegistry = AdapterRegistry();
+  sl.registerSingleton<AdapterRegistry>(adapterRegistry);
 }
