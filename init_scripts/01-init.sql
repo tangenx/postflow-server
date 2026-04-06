@@ -291,3 +291,8 @@ INSERT INTO media_types (slug, display_name, allowed_extensions, mime_types, max
     ('image', 'Image', ARRAY['jpg','jpeg','png','webp'], ARRAY['image/jpeg','image/png','image/webp'], 20),
     ('gif',   'GIF',   ARRAY['gif'],                    ARRAY['image/gif'],                           50),
     ('video', 'Video', ARRAY['mp4','webm'],              ARRAY['video/mp4','video/webm'],             200);
+
+-- social networks
+INSERT INTO social_networks (slug, display_name, capabilities) VALUES
+    ('vk', 'VK', '{"max_images": 10, "supports_gif": true, "supports_video": true, "max_caption_len": 4096}'),
+    ('telegram', 'Telegram', '{"max_images": 10, "supports_gif": true, "supports_video": true, "max_caption_len": 2048}');
