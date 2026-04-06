@@ -120,7 +120,7 @@ final _testNetwork = SocialNetwork(
   id: UuidValue.fromString(_socialNetworkId),
   slug: 'twitter',
   displayName: 'Twitter',
-  data: const {},
+  capabilities: const {},
   isActive: true,
 );
 

@@ -306,7 +306,7 @@ final _testNetwork = SocialNetwork(
   id: UuidValue.fromString(_networkId),
   slug: 'test_network',
   displayName: 'Test Network',
-  data: '{}',
+  capabilities: '{}',
   isActive: true,
 );
 

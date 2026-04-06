@@ -135,7 +135,7 @@ class AccountWithNetwork {
         'id': network.id.toString(),
         'slug': network.slug,
         'displayName': network.displayName,
-        'data': network.data,
+        'capabilities': network.capabilities,
         'isActive': network.isActive,
       },
     };
