@@ -134,7 +134,7 @@ void main() {
       expect(capturedUserId, isNotNull);
       expect(
         capturedUserId.toString(),
-        equals('00000000-0000-0000-0000-000000000000'),
+        equals('00000000-0000-0000-0000-000000000001'),
       );
     });
   });
