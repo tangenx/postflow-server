@@ -1671,10 +1671,12 @@ class $SocialNetworksTable extends SocialNetworks
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  static const VerificationMeta _capabilitiesMeta = const VerificationMeta(
+    'capabilities',
+  );
   @override
-  late final GeneratedColumn<Object> data = GeneratedColumn<Object>(
-    'data',
+  late final GeneratedColumn<Object> capabilities = GeneratedColumn<Object>(
+    'capabilities',
     aliasedName,
     false,
     type: PgTypes.jsonb,
@@ -1694,7 +1696,13 @@ class $SocialNetworksTable extends SocialNetworks
     defaultValue: const Constant(true),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, slug, displayName, data, isActive];
+  List<GeneratedColumn> get $columns => [
+    id,
+    slug,
+    displayName,
+    capabilities,
+    isActive,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1729,10 +1737,13 @@ class $SocialNetworksTable extends SocialNetworks
     } else if (isInserting) {
       context.missing(_displayNameMeta);
     }
-    if (data.containsKey('data')) {
+    if (data.containsKey('capabilities')) {
       context.handle(
-        _dataMeta,
-        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+        _capabilitiesMeta,
+        capabilities.isAcceptableOrUnknown(
+          data['capabilities']!,
+          _capabilitiesMeta,
+        ),
       );
     }
     if (data.containsKey('is_active')) {
@@ -1762,9 +1773,9 @@ class $SocialNetworksTable extends SocialNetworks
         DriftSqlType.string,
         data['${effectivePrefix}display_name'],
       )!,
-      data: attachedDatabase.typeMapping.read(
+      capabilities: attachedDatabase.typeMapping.read(
         PgTypes.jsonb,
-        data['${effectivePrefix}data'],
+        data['${effectivePrefix}capabilities'],
       )!,
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
@@ -1783,13 +1794,13 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
   final UuidValue id;
   final String slug;
   final String displayName;
-  final Object data;
+  final Object capabilities;
   final bool isActive;
   const SocialNetwork({
     required this.id,
     required this.slug,
     required this.displayName,
-    required this.data,
+    required this.capabilities,
     required this.isActive,
   });
   @override
@@ -1798,7 +1809,7 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
     map['id'] = Variable<UuidValue>(id, PgTypes.uuid);
     map['slug'] = Variable<String>(slug);
     map['display_name'] = Variable<String>(displayName);
-    map['data'] = Variable<Object>(data, PgTypes.jsonb);
+    map['capabilities'] = Variable<Object>(capabilities, PgTypes.jsonb);
     map['is_active'] = Variable<bool>(isActive);
     return map;
   }
@@ -1808,7 +1819,7 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
       id: Value(id),
       slug: Value(slug),
       displayName: Value(displayName),
-      data: Value(data),
+      capabilities: Value(capabilities),
       isActive: Value(isActive),
     );
   }
@@ -1822,7 +1833,7 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
       id: serializer.fromJson<UuidValue>(json['id']),
       slug: serializer.fromJson<String>(json['slug']),
       displayName: serializer.fromJson<String>(json['displayName']),
-      data: serializer.fromJson<Object>(json['data']),
+      capabilities: serializer.fromJson<Object>(json['capabilities']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
@@ -1833,7 +1844,7 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
       'id': serializer.toJson<UuidValue>(id),
       'slug': serializer.toJson<String>(slug),
       'displayName': serializer.toJson<String>(displayName),
-      'data': serializer.toJson<Object>(data),
+      'capabilities': serializer.toJson<Object>(capabilities),
       'isActive': serializer.toJson<bool>(isActive),
     };
   }
@@ -1842,13 +1853,13 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
     UuidValue? id,
     String? slug,
     String? displayName,
-    Object? data,
+    Object? capabilities,
     bool? isActive,
   }) => SocialNetwork(
     id: id ?? this.id,
     slug: slug ?? this.slug,
     displayName: displayName ?? this.displayName,
-    data: data ?? this.data,
+    capabilities: capabilities ?? this.capabilities,
     isActive: isActive ?? this.isActive,
   );
   SocialNetwork copyWithCompanion(SocialNetworksCompanion data) {
@@ -1858,7 +1869,9 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
       displayName: data.displayName.present
           ? data.displayName.value
           : this.displayName,
-      data: data.data.present ? data.data.value : this.data,
+      capabilities: data.capabilities.present
+          ? data.capabilities.value
+          : this.capabilities,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
   }
@@ -1869,14 +1882,15 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
           ..write('id: $id, ')
           ..write('slug: $slug, ')
           ..write('displayName: $displayName, ')
-          ..write('data: $data, ')
+          ..write('capabilities: $capabilities, ')
           ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, slug, displayName, data, isActive);
+  int get hashCode =>
+      Object.hash(id, slug, displayName, capabilities, isActive);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1884,7 +1898,7 @@ class SocialNetwork extends DataClass implements Insertable<SocialNetwork> {
           other.id == this.id &&
           other.slug == this.slug &&
           other.displayName == this.displayName &&
-          other.data == this.data &&
+          other.capabilities == this.capabilities &&
           other.isActive == this.isActive);
 }
 
@@ -1892,14 +1906,14 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
   final Value<UuidValue> id;
   final Value<String> slug;
   final Value<String> displayName;
-  final Value<Object> data;
+  final Value<Object> capabilities;
   final Value<bool> isActive;
   final Value<int> rowid;
   const SocialNetworksCompanion({
     this.id = const Value.absent(),
     this.slug = const Value.absent(),
     this.displayName = const Value.absent(),
-    this.data = const Value.absent(),
+    this.capabilities = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1907,7 +1921,7 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
     this.id = const Value.absent(),
     required String slug,
     required String displayName,
-    this.data = const Value.absent(),
+    this.capabilities = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : slug = Value(slug),
@@ -1916,7 +1930,7 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
     Expression<UuidValue>? id,
     Expression<String>? slug,
     Expression<String>? displayName,
-    Expression<Object>? data,
+    Expression<Object>? capabilities,
     Expression<bool>? isActive,
     Expression<int>? rowid,
   }) {
@@ -1924,7 +1938,7 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
       if (id != null) 'id': id,
       if (slug != null) 'slug': slug,
       if (displayName != null) 'display_name': displayName,
-      if (data != null) 'data': data,
+      if (capabilities != null) 'capabilities': capabilities,
       if (isActive != null) 'is_active': isActive,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1934,7 +1948,7 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
     Value<UuidValue>? id,
     Value<String>? slug,
     Value<String>? displayName,
-    Value<Object>? data,
+    Value<Object>? capabilities,
     Value<bool>? isActive,
     Value<int>? rowid,
   }) {
@@ -1942,7 +1956,7 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
       id: id ?? this.id,
       slug: slug ?? this.slug,
       displayName: displayName ?? this.displayName,
-      data: data ?? this.data,
+      capabilities: capabilities ?? this.capabilities,
       isActive: isActive ?? this.isActive,
       rowid: rowid ?? this.rowid,
     );
@@ -1960,8 +1974,8 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
     if (displayName.present) {
       map['display_name'] = Variable<String>(displayName.value);
     }
-    if (data.present) {
-      map['data'] = Variable<Object>(data.value, PgTypes.jsonb);
+    if (capabilities.present) {
+      map['capabilities'] = Variable<Object>(capabilities.value, PgTypes.jsonb);
     }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
@@ -1978,7 +1992,7 @@ class SocialNetworksCompanion extends UpdateCompanion<SocialNetwork> {
           ..write('id: $id, ')
           ..write('slug: $slug, ')
           ..write('displayName: $displayName, ')
-          ..write('data: $data, ')
+          ..write('capabilities: $capabilities, ')
           ..write('isActive: $isActive, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -10317,7 +10331,7 @@ typedef $$SocialNetworksTableCreateCompanionBuilder =
       Value<UuidValue> id,
       required String slug,
       required String displayName,
-      Value<Object> data,
+      Value<Object> capabilities,
       Value<bool> isActive,
       Value<int> rowid,
     });
@@ -10326,7 +10340,7 @@ typedef $$SocialNetworksTableUpdateCompanionBuilder =
       Value<UuidValue> id,
       Value<String> slug,
       Value<String> displayName,
-      Value<Object> data,
+      Value<Object> capabilities,
       Value<bool> isActive,
       Value<int> rowid,
     });
@@ -10396,8 +10410,8 @@ class $$SocialNetworksTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<Object> get data => $composableBuilder(
-    column: $table.data,
+  ColumnFilters<Object> get capabilities => $composableBuilder(
+    column: $table.capabilities,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10456,8 +10470,8 @@ class $$SocialNetworksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<Object> get data => $composableBuilder(
-    column: $table.data,
+  ColumnOrderings<Object> get capabilities => $composableBuilder(
+    column: $table.capabilities,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -10487,8 +10501,10 @@ class $$SocialNetworksTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<Object> get data =>
-      $composableBuilder(column: $table.data, builder: (column) => column);
+  GeneratedColumn<Object> get capabilities => $composableBuilder(
+    column: $table.capabilities,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -10553,14 +10569,14 @@ class $$SocialNetworksTableTableManager
                 Value<UuidValue> id = const Value.absent(),
                 Value<String> slug = const Value.absent(),
                 Value<String> displayName = const Value.absent(),
-                Value<Object> data = const Value.absent(),
+                Value<Object> capabilities = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SocialNetworksCompanion(
                 id: id,
                 slug: slug,
                 displayName: displayName,
-                data: data,
+                capabilities: capabilities,
                 isActive: isActive,
                 rowid: rowid,
               ),
@@ -10569,14 +10585,14 @@ class $$SocialNetworksTableTableManager
                 Value<UuidValue> id = const Value.absent(),
                 required String slug,
                 required String displayName,
-                Value<Object> data = const Value.absent(),
+                Value<Object> capabilities = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SocialNetworksCompanion.insert(
                 id: id,
                 slug: slug,
                 displayName: displayName,
-                data: data,
+                capabilities: capabilities,
                 isActive: isActive,
                 rowid: rowid,
               ),
@@ -17770,6 +17786,8 @@ mixin _$MediaDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $MediaTypesTable get mediaTypes => attachedDatabase.mediaTypes;
   $UsersTable get users => attachedDatabase.users;
   $MediaFilesTable get mediaFiles => attachedDatabase.mediaFiles;
+  $PostsTable get posts => attachedDatabase.posts;
+  $PostMediaTable get postMedia => attachedDatabase.postMedia;
   MediaDaoManager get managers => MediaDaoManager(this);
 }
 
@@ -17782,6 +17800,10 @@ class MediaDaoManager {
       $$UsersTableTableManager(_db.attachedDatabase, _db.users);
   $$MediaFilesTableTableManager get mediaFiles =>
       $$MediaFilesTableTableManager(_db.attachedDatabase, _db.mediaFiles);
+  $$PostsTableTableManager get posts =>
+      $$PostsTableTableManager(_db.attachedDatabase, _db.posts);
+  $$PostMediaTableTableManager get postMedia =>
+      $$PostMediaTableTableManager(_db.attachedDatabase, _db.postMedia);
 }
 
 mixin _$PostsDaoMixin on DatabaseAccessor<PostflowDatabase> {
