@@ -106,7 +106,7 @@ class PublisherService {
 
       final mediaBytes = await Future.wait(
         media.map((m) async {
-          if (m.mediaFile.storageType != StorageType.remote) {
+          if (m.mediaFile.storageType == StorageType.remote) {
             return null;
           }
 
