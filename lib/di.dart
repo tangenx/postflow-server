@@ -2,6 +2,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:get_it/get_it.dart';
 
 import 'adapters/adapter_registry.dart';
+import 'adapters/telegram_adapter.dart';
 import 'config/app_config.dart';
 import 'core/constants.dart';
 import 'database/database.dart';
@@ -35,6 +36,10 @@ void registerDependencies() {
   // config
   sl.registerSingleton<AppConfig>((AppConfig.fromEnvironment(env)));
   sl.registerSingleton<PostflowDatabase>(PostflowDatabase(sl.get<AppConfig>()));
+
+  // adapters
+  final adapterRegistry = AdapterRegistry()..register(TelegramAdapter());
+  sl.registerSingleton<AdapterRegistry>(adapterRegistry);
 
   // daos
   sl.registerSingleton<RefreshTokensDao>(
@@ -155,8 +160,4 @@ void registerDependencies() {
   sl.registerSingleton<ScheduleHandler>(
     ScheduleHandler(sl.get<ScheduleService>()),
   );
-
-  // adapters
-  final adapterRegistry = AdapterRegistry();
-  sl.registerSingleton<AdapterRegistry>(adapterRegistry);
 }

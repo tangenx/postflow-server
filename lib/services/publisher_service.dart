@@ -6,6 +6,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
 
 import '../adapters/adapter_registry.dart';
+import '../adapters/telegram_adapter.dart';
 import '../config/app_config.dart';
 import '../core/constants.dart';
 import '../database/database.dart';
@@ -181,6 +182,6 @@ class PublisherService {
   }
 
   static AdapterRegistry _buildAdapterRegistry(AppConfig config) {
-    return AdapterRegistry();
+    return AdapterRegistry()..register(TelegramAdapter());
   }
 }
