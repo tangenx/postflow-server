@@ -89,7 +89,52 @@ class ScheduleDao extends DatabaseAccessor<PostflowDatabase>
         target: row.readTable(socialAccountTargets),
         account: row.readTable(userSocialAccounts),
         network: row.readTable(socialNetworks),
-        caption: row.readTable(postCaptions),
+        caption: row.readTableOrNull(postCaptions),
+      );
+    }).toList();
+  }
+
+  /// find all scheldules for a post
+  /// only for scheduler
+  Future<List<ScheduleWithDetails>> findSchedulesForPostInternal(
+    UuidValue postId,
+  ) async {
+    final rows =
+        await (select(postSchedules).join([
+                innerJoin(
+                  socialAccountTargets,
+                  socialAccountTargets.id.equalsExp(
+                    postSchedules.socialAccountTargetId,
+                  ),
+                ),
+                innerJoin(
+                  userSocialAccounts,
+                  userSocialAccounts.id.equalsExp(
+                    socialAccountTargets.userSocialAccountId,
+                  ),
+                ),
+                innerJoin(
+                  socialNetworks,
+                  socialNetworks.id.equalsExp(
+                    userSocialAccounts.socialNetworkId,
+                  ),
+                ),
+                leftOuterJoin(
+                  postCaptions,
+                  postCaptions.postScheduleId.equalsExp(postSchedules.id),
+                ),
+              ])
+              ..where(postSchedules.postId.equals(postId))
+              ..orderBy([OrderingTerm.asc(postSchedules.scheduledAt)]))
+            .get();
+
+    return rows.map((row) {
+      return ScheduleWithDetails(
+        schedule: row.readTable(postSchedules),
+        target: row.readTable(socialAccountTargets),
+        account: row.readTable(userSocialAccounts),
+        network: row.readTable(socialNetworks),
+        caption: row.readTableOrNull(postCaptions),
       );
     }).toList();
   }

@@ -160,6 +160,13 @@ class PostsDao extends DatabaseAccessor<PostflowDatabase> with _$PostsDaoMixin {
     return updated.single;
   }
 
+  /// only for scheduler
+  Future<void> updatePostStatusInternal(UuidValue id, PostStatus status) {
+    return (update(posts)..where((p) => p.id.equals(id))).write(
+      PostsCompanion(status: Value(status)),
+    );
+  }
+
   Future<void> detachArtists(UuidValue postId) {
     return (delete(postArtists)..where((a) => a.postId.equals(postId))).go();
   }

@@ -1,6 +1,6 @@
 part of '../database.dart';
 
-@DriftAccessor(tables: [MediaTypes, MediaFiles])
+@DriftAccessor(tables: [MediaTypes, MediaFiles, PostMedia])
 class MediaDao extends DatabaseAccessor<PostflowDatabase> with _$MediaDaoMixin {
   MediaDao(super.attachedDatabase);
 
@@ -15,6 +15,49 @@ class MediaDao extends DatabaseAccessor<PostflowDatabase> with _$MediaDaoMixin {
     return (select(
       mediaTypes,
     )..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  /// get all media files attached to a post with their types
+  /// used for scheduler
+  Future<List<MediaFileWithMediaType>> findByPostIdWithType(
+    UuidValue postId,
+  ) async {
+    final query =
+        await (select(postMedia).join([
+                innerJoin(
+                  mediaFiles,
+                  mediaFiles.id.equalsExp(postMedia.mediaFileId),
+                ),
+                innerJoin(
+                  mediaTypes,
+                  mediaTypes.id.equalsExp(mediaFiles.mediaTypeId),
+                ),
+              ])
+              ..where(postMedia.postId.equals(postId))
+              ..orderBy([OrderingTerm.desc(postMedia.sortOrder)]))
+            .get();
+
+    return query
+        .map(
+          (row) => MediaFileWithMediaType(
+            mediaFile: row.readTable(mediaFiles),
+            mediaType: row.readTable(mediaTypes),
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<MediaFile>> findOrphaned(Duration ttl) async {
+    final cutoff = DateTime.now().subtract(ttl);
+    return (select(mediaFiles)..where(
+          (tbl) =>
+              tbl.uploadedAt.isSmallerThanValue(PgDateTime(cutoff)) &
+              notExistsQuery(
+                select(postMedia)
+                  ..where((pm) => pm.mediaFileId.equalsExp(tbl.id)),
+              ),
+        ))
+        .get();
   }
 
   Future<MediaFile> createFile({
@@ -55,5 +98,22 @@ class MediaDao extends DatabaseAccessor<PostflowDatabase> with _$MediaDaoMixin {
 
   Future<int> deleteFile(UuidValue id) {
     return (delete(mediaFiles)..where((t) => t.id.equals(id))).go();
+  }
+}
+
+class MediaFileWithMediaType {
+  final MediaFile mediaFile;
+  final MediaType mediaType;
+
+  const MediaFileWithMediaType({
+    required this.mediaFile,
+    required this.mediaType,
+  });
+
+  factory MediaFileWithMediaType.fromJson(Map<String, dynamic> json) {
+    return MediaFileWithMediaType(
+      mediaFile: MediaFile.fromJson(json['mediaFile'] as Map<String, dynamic>),
+      mediaType: MediaType.fromJson(json['mediaType'] as Map<String, dynamic>),
+    );
   }
 }
