@@ -1,7 +1,6 @@
 name: postflow_server
 description: Server app for Postflow.
 version: 0.0.1
-# repository: https://github.com/my_org/my_repo
 
 environment:
   sdk: ^3.11.2
@@ -21,6 +20,7 @@ dependencies:
   minio: ^3.5.8
   mime: ^2.0.0
   collection: ^1.19.1
+  televerse: ^2.4.4
 
 dev_dependencies:
   http: ^1.6.0

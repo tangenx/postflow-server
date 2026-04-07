@@ -209,6 +209,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.7"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: aff32c08f92787a557dd5c0145ac91536481831a01b4648136373cddb0e64f8c
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.9.2"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "2f9e64323a7c3c7ef69567d5c800424a11f8337b8b228bad02524c9fb3c1f340"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.2"
   dotenv:
     dependency: "direct main"
     description:
@@ -265,6 +281,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  freezed:
+    dependency: transitive
+    description:
+      name: freezed
+      sha256: f23ea33b3863f119b58ed1b586e881a46bd28715ddcc4dbc33104524e3434131
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.5"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: "7294967ff0a6d98638e7acb774aac3af2550777accd8149c90af5b014e6d44d8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -633,6 +665,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  televerse:
+    dependency: "direct main"
+    description:
+      name: televerse
+      sha256: "70758a1fa2325d21a2ac94234aede8f6b4f7c96ddeefb903ff368c9d697dd452"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.0"
   term_glyph:
     dependency: transitive
     description:
