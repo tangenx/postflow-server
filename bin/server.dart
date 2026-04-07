@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:postflow_server/config/app_config.dart';
 import 'package:postflow_server/di.dart';
 import 'package:postflow_server/routes/router.dart';
+import 'package:postflow_server/services/publisher_service.dart';
 import 'package:postflow_server/utils/logger.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_hotreload/shelf_hotreload.dart';
@@ -18,6 +20,8 @@ void main(List<String> args) async {
     onHotReloadAvailable: () => _log.info('Hot reload available'),
     onHotReloadLog: (log) => _log.info(log.message),
   );
+
+  await PublisherService.spawn(sl.get<AppConfig>());
 }
 
 Future<HttpServer> createServer() {
