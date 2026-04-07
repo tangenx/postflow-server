@@ -2,18 +2,19 @@ import 'package:drift_postgres/drift_postgres.dart';
 import 'package:shelf/shelf.dart';
 
 import '../database/database.dart';
+import '../services/user_social_account_service.dart';
 import '../utils/api_response.dart';
 import '../utils/request_validation.dart';
 
 class UserSocialAccountHandler {
-  final UserSocialAccountsDao _accountsDao;
+  final UserSocialAccountService _service;
 
-  UserSocialAccountHandler(this._accountsDao);
+  UserSocialAccountHandler(this._service);
 
   /// GET /api/social-accounts
   Future<Response> getAccounts(Request request) async {
     final userId = request.context['userId'] as UuidValue;
-    final accounts = await _accountsDao.findByUser(userId);
+    final accounts = await _service.getAccounts(userId);
 
     return ApiResponse.ok(accounts.map((a) => a.toJson()).toList());
   }
@@ -22,7 +23,7 @@ class UserSocialAccountHandler {
   Future<Response> getAccount(Request request, String id) async {
     final userId = request.context['userId'] as UuidValue;
     final accountId = UuidValue.withValidation(id);
-    final account = await _accountsDao.findByIdAndUser(accountId, userId);
+    final account = await _service.getAccount(accountId, userId);
 
     if (account == null) {
       return ApiResponse.error(404, 'NOT_FOUND', 'Account not found');
@@ -34,8 +35,6 @@ class UserSocialAccountHandler {
   /// POST /api/social-accounts
   /// {
   ///   "socialNetworkId": "00000000-0000-0000-0000-000000000001",
-  ///   "externalAccountId": "1234567890",
-  ///   "screenName": "tangenx",
   ///   "accessToken": "1234567890",
   ///   "refreshToken": "1234567890",
   ///   "tokenExpiresAt": "2026-01-01T00:00:00.000Z",
@@ -46,11 +45,9 @@ class UserSocialAccountHandler {
       await request.readAsString(),
     );
 
-    final account = await _accountsDao.create(
+    final account = await _service.create(
       userId: userId,
       socialNetworkId: UuidValue.withValidation(data['socialNetworkId']),
-      externalAccountId: data['externalAccountId'],
-      screenName: data['screenName'],
       accessToken: data['accessToken'],
       refreshToken: data['refreshToken'],
       tokenExpiresAt: data['tokenExpiresAt'] != null
@@ -76,7 +73,7 @@ class UserSocialAccountHandler {
       await request.readAsString(),
     );
 
-    final account = await _accountsDao.updateSocialAccount(
+    final account = await _service.update(
       id: accountId,
       userId: userId,
       screenName: data['screenName'],
@@ -95,7 +92,7 @@ class UserSocialAccountHandler {
   Future<Response> delete(Request request, String id) async {
     final userId = request.context['userId'] as UuidValue;
     final accountId = UuidValue.withValidation(id);
-    await _accountsDao.deleteSocialAccount(accountId, userId);
+    await _service.delete(accountId, userId);
 
     return ApiResponse.ok(null);
   }
