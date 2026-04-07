@@ -34,7 +34,7 @@ void registerDependencies() {
 
   // config
   sl.registerSingleton<AppConfig>((AppConfig.fromEnvironment(env)));
-  sl.registerSingleton<PostflowDatabase>(PostflowDatabase());
+  sl.registerSingleton<PostflowDatabase>(PostflowDatabase(sl.get<AppConfig>()));
 
   // daos
   sl.registerSingleton<RefreshTokensDao>(

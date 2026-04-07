@@ -6,7 +6,6 @@ import 'package:postgres/postgres.dart' as pg;
 import '../config/app_config.dart';
 import '../core/constants.dart';
 import '../core/exceptions.dart';
-import '../di.dart';
 import '../utils/logger.dart';
 import 'codec/enum_codec.dart';
 import 'tables/artists.dart';
@@ -72,17 +71,15 @@ const _log = Logger('Database');
   ],
 )
 class PostflowDatabase extends _$PostflowDatabase {
-  PostflowDatabase([QueryExecutor? executor])
-    : super(executor ?? _openConnection());
+  PostflowDatabase(AppConfig config, [QueryExecutor? executor])
+    : super(executor ?? _openConnection(config));
 
   @override
   int get schemaVersion => 1;
 
-  static QueryExecutor _openConnection() {
+  static QueryExecutor _openConnection(AppConfig config) {
     return LazyDatabase(
       () async {
-        final config = sl<AppConfig>();
-
         final endpoint = pg.Endpoint(
           host: config.dbHost,
           database: config.dbName,
