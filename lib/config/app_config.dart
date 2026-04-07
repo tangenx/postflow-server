@@ -19,6 +19,8 @@ class AppConfig {
   final String? s3Region;
   final String? s3AccessKey;
   final String? s3SecretKey;
+  final Duration schedulerCheckInterval;
+  final Duration mediaOrphanTtl;
 
   const AppConfig({
     required this.dbName,
@@ -37,6 +39,8 @@ class AppConfig {
     this.s3AccessKey,
     this.s3SecretKey,
     this.s3Endpoint,
+    required this.schedulerCheckInterval,
+    required this.mediaOrphanTtl,
   });
 
   factory AppConfig.fromEnvironment(DotEnv env) {
@@ -73,6 +77,14 @@ class AppConfig {
       s3Region: env['S3_REGION'],
       s3AccessKey: env['S3_ACCESS_KEY'],
       s3SecretKey: env['S3_SECRET_KEY'],
+      schedulerCheckInterval: Duration(
+        seconds: int.parse(
+          getValue('SCHEDULER_CHECK_INTERVAL', fallback: '30'),
+        ),
+      ),
+      mediaOrphanTtl: Duration(
+        hours: int.parse(getValue('MEDIA_ORPHAN_TTL_HOURS', fallback: '24')),
+      ),
     );
   }
 }
