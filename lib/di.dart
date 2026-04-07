@@ -23,6 +23,7 @@ import 'services/jwt_service.dart';
 import 'services/media_service.dart';
 import 'services/posts_service.dart';
 import 'services/schedule_service.dart';
+import 'services/user_social_account_service.dart';
 import 'services/storage/local_storage_service.dart';
 import 'services/storage/remote_storage_service.dart';
 import 'services/storage/s3_storage_service.dart';
@@ -71,6 +72,9 @@ void registerDependencies() {
     UserSocialAccountsDao(sl.get<PostflowDatabase>()),
   );
   sl.registerSingleton<ScheduleDao>(ScheduleDao(sl.get<PostflowDatabase>()));
+  sl.registerSingleton<SocialNetworksDao>(
+    SocialNetworksDao(sl.get<PostflowDatabase>()),
+  );
 
   // services
   sl.registerSingleton<JwtService>(JwtService(sl.get<AppConfig>()));
@@ -118,6 +122,13 @@ void registerDependencies() {
       captionTemplatesDao: sl.get<CaptionTemplatesDao>(),
     ),
   );
+  sl.registerSingleton<UserSocialAccountService>(
+    UserSocialAccountService(
+      accountsDao: sl.get<UserSocialAccountsDao>(),
+      networksDao: sl.get<SocialNetworksDao>(),
+      adapterRegistry: sl.get<AdapterRegistry>(),
+    ),
+  );
 
   // handlers
   sl.registerSingleton<AuthHandler>(
@@ -155,7 +166,7 @@ void registerDependencies() {
     ),
   );
   sl.registerSingleton<UserSocialAccountHandler>(
-    UserSocialAccountHandler(sl.get<UserSocialAccountsDao>()),
+    UserSocialAccountHandler(sl.get<UserSocialAccountService>()),
   );
   sl.registerSingleton<ScheduleHandler>(
     ScheduleHandler(sl.get<ScheduleService>()),
