@@ -137,6 +137,8 @@ AppConfig _testConfig({StorageType storageType = StorageType.local}) {
     jwtAccessTtl: const Duration(minutes: 15),
     jwtRefreshTtl: const Duration(days: 7),
     storageType: storageType,
+    schedulerCheckInterval: const Duration(seconds: 30),
+    mediaOrphanTtl: const Duration(hours: 24),
   );
 }
 

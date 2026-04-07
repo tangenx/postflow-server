@@ -75,6 +75,8 @@ void main() {
       jwtAccessTtl: Duration(minutes: 15),
       jwtRefreshTtl: Duration(days: 7),
       storageType: StorageType.local,
+      schedulerCheckInterval: const Duration(seconds: 30),
+      mediaOrphanTtl: const Duration(hours: 24),
     );
     fakeAuth = FakeAuthService(testAuthData);
     handler = AuthHandler(fakeAuth, config);

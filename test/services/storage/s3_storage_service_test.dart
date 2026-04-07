@@ -24,6 +24,8 @@ AppConfig _testConfig() {
     s3Region: 'us-east-1',
     s3AccessKey: 'ak',
     s3SecretKey: 'sk',
+    schedulerCheckInterval: const Duration(seconds: 30),
+    mediaOrphanTtl: const Duration(hours: 24),
   );
 }
 
@@ -48,6 +50,8 @@ void main() {
           jwtAccessTtl: const Duration(minutes: 15),
           jwtRefreshTtl: const Duration(days: 7),
           storageType: StorageType.s3,
+          schedulerCheckInterval: const Duration(seconds: 30),
+          mediaOrphanTtl: const Duration(hours: 24),
         );
 
         // s3Endpoint is null — null check fails

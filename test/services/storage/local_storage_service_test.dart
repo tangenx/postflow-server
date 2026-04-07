@@ -20,6 +20,8 @@ AppConfig _testConfig(String storagePath) {
     jwtRefreshTtl: const Duration(days: 7),
     storageType: StorageType.local,
     localStoragePath: storagePath,
+    schedulerCheckInterval: const Duration(seconds: 30),
+    mediaOrphanTtl: const Duration(hours: 24),
   );
 }
 

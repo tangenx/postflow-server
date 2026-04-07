@@ -18,6 +18,8 @@ AppConfig _testConfig({bool authEnabled = true}) {
     jwtAccessTtl: const Duration(minutes: 15),
     jwtRefreshTtl: const Duration(days: 7),
     storageType: StorageType.local,
+    schedulerCheckInterval: const Duration(seconds: 30),
+    mediaOrphanTtl: const Duration(hours: 24),
   );
 }
 
