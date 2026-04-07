@@ -6,18 +6,26 @@ import 'package:test/test.dart';
 import 'package:postflow_server/core/exceptions.dart';
 import 'package:postflow_server/database/database.dart';
 import 'package:postflow_server/handlers/user_social_account_handler.dart';
+import 'package:postflow_server/services/user_social_account_service.dart';
 
 // ---------------------------------------------------------------------------
-// Fake DAO
+// Fake service
 // ---------------------------------------------------------------------------
 
-class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
+class FakeUserSocialAccountService implements UserSocialAccountService {
   List<AccountWithNetwork> accountsWithNetwork = [];
   UserSocialAccount? findByIdAndUserResult;
   UserSocialAccount? createdAccount;
   UserSocialAccount? updatedAccount;
   int deleteCallCount = 0;
   Object? _exception;
+
+  // Tracking fields for create
+  UuidValue? createUserId;
+  UuidValue? createSocialNetworkId;
+  String? createAccessToken;
+  String? createRefreshToken;
+  DateTime? createTokenExpiresAt;
 
   void setException(Object ex) => _exception = ex;
 
@@ -29,37 +37,25 @@ class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
   @override
-  Future<List<AccountWithNetwork>> findByUser(UuidValue userId) async {
-    _maybeThrow();
-    return accountsWithNetwork;
-  }
-
-  @override
-  Future<UserSocialAccount?> findByIdAndUser(
-    UuidValue id,
-    UuidValue userId,
-  ) async {
-    _maybeThrow();
-    return findByIdAndUserResult;
-  }
-
-  @override
   Future<UserSocialAccount> create({
     required UuidValue userId,
     required UuidValue socialNetworkId,
-    required String externalAccountId,
-    String? screenName,
-    String? accessToken,
+    required String accessToken,
     String? refreshToken,
     DateTime? tokenExpiresAt,
   }) async {
     _maybeThrow();
+    createUserId = userId;
+    createSocialNetworkId = socialNetworkId;
+    createAccessToken = accessToken;
+    createRefreshToken = refreshToken;
+    createTokenExpiresAt = tokenExpiresAt;
     final account = UserSocialAccount(
       id: UuidValue.fromString('33333333-3333-4333-8333-333333333333'),
       userId: userId,
       socialNetworkId: socialNetworkId,
-      externalAccountId: externalAccountId,
-      screenName: screenName,
+      externalAccountId: '1234567890',
+      screenName: 'testuser',
       accessToken: accessToken,
       refreshToken: refreshToken,
       tokenExpiresAt: tokenExpiresAt != null
@@ -73,7 +69,22 @@ class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
   }
 
   @override
-  Future<UserSocialAccount> updateSocialAccount({
+  Future<List<AccountWithNetwork>> getAccounts(UuidValue userId) async {
+    _maybeThrow();
+    return accountsWithNetwork;
+  }
+
+  @override
+  Future<UserSocialAccount?> getAccount(
+    UuidValue id,
+    UuidValue userId,
+  ) async {
+    _maybeThrow();
+    return findByIdAndUserResult;
+  }
+
+  @override
+  Future<UserSocialAccount> update({
     required UuidValue id,
     required UuidValue userId,
     String? screenName,
@@ -87,7 +98,7 @@ class FakeUserSocialAccountsDao implements UserSocialAccountsDao {
   }
 
   @override
-  Future<void> deleteSocialAccount(UuidValue id, UuidValue userId) async {
+  Future<void> delete(UuidValue id, UuidValue userId) async {
     _maybeThrow();
     deleteCallCount++;
   }
@@ -166,18 +177,18 @@ Request _jsonPut(String path, Map<String, dynamic> body) {
 // ---------------------------------------------------------------------------
 
 void main() {
-  late FakeUserSocialAccountsDao fakeDao;
+  late FakeUserSocialAccountService fakeService;
   late UserSocialAccountHandler handler;
 
   setUp(() {
-    fakeDao = FakeUserSocialAccountsDao();
-    handler = UserSocialAccountHandler(fakeDao);
+    fakeService = FakeUserSocialAccountService();
+    handler = UserSocialAccountHandler(fakeService);
   });
 
   group('UserSocialAccountHandler', () {
     group('getAccounts', () {
       test('returns list of accounts as JSON', () async {
-        fakeDao.accountsWithNetwork = [_testAccountWithNetwork];
+        fakeService.accountsWithNetwork = [_testAccountWithNetwork];
         final request = _mockRequest(userId: UuidValue.fromString(_userId));
 
         final response = await handler.getAccounts(request);
@@ -192,7 +203,7 @@ void main() {
       });
 
       test('returns empty list when no accounts', () async {
-        fakeDao.accountsWithNetwork = [];
+        fakeService.accountsWithNetwork = [];
         final request = _mockRequest(userId: UuidValue.fromString(_userId));
 
         final response = await handler.getAccounts(request);
@@ -203,8 +214,8 @@ void main() {
         expect(body['data'] as List, isEmpty);
       });
 
-      test('throws when DAO throws', () async {
-        fakeDao.setException(Exception('DB error'));
+      test('throws when service throws', () async {
+        fakeService.setException(Exception('DB error'));
         final request = _mockRequest(userId: UuidValue.fromString(_userId));
 
         expect(() => handler.getAccounts(request), throwsA(isA<Exception>()));
@@ -213,7 +224,7 @@ void main() {
 
     group('getAccount', () {
       test('returns account when found', () async {
-        fakeDao.findByIdAndUserResult = _testAccount;
+        fakeService.findByIdAndUserResult = _testAccount;
         final request = _mockRequest(userId: UuidValue.fromString(_userId));
 
         final response = await handler.getAccount(request, _accountId);
@@ -227,7 +238,7 @@ void main() {
       });
 
       test('returns 404 when not found', () async {
-        fakeDao.findByIdAndUserResult = null;
+        fakeService.findByIdAndUserResult = null;
         final request = _mockRequest(userId: UuidValue.fromString(_userId));
 
         final response = await handler.getAccount(request, _accountId);
@@ -239,7 +250,7 @@ void main() {
       });
 
       test('returns 404 for different user\'s account', () async {
-        fakeDao.findByIdAndUserResult = null;
+        fakeService.findByIdAndUserResult = null;
         final otherUserId = '99999999-9999-4999-8999-999999999999';
         final request = _mockRequest(userId: UuidValue.fromString(otherUserId));
 
@@ -262,8 +273,6 @@ void main() {
       test('creates account and returns safe JSON', () async {
         final request = _jsonPost('api/social-accounts', {
           'socialNetworkId': _socialNetworkId,
-          'externalAccountId': _externalAccountId,
-          'screenName': _screenName,
           'accessToken': 'access-token-123',
           'refreshToken': 'refresh-token-456',
         }).change(context: {'userId': UuidValue.fromString(_userId)});
@@ -273,16 +282,39 @@ void main() {
         expect(response.statusCode, equals(200));
         final body = jsonDecode(await response.readAsString());
         expect(body['ok'], isTrue);
-        expect(body['data']['screenName'], equals(_screenName));
-        expect(body['data']['externalAccountId'], equals(_externalAccountId));
+        expect(body['data']['screenName'], equals('testuser'));
+        expect(body['data']['externalAccountId'], equals('1234567890'));
         expect(body['data'], isNot(contains('accessToken')));
         expect(body['data'], isNot(contains('refreshToken')));
-        expect(fakeDao.createdAccount, isNotNull);
+        expect(fakeService.createdAccount, isNotNull);
+      });
+
+      test('passes correct params to service', () async {
+        final request = _jsonPost('api/social-accounts', {
+          'socialNetworkId': _socialNetworkId,
+          'accessToken': 'access-token-123',
+          'refreshToken': 'refresh-token-456',
+          'tokenExpiresAt': '2026-01-01T00:00:00.000Z',
+        }).change(context: {'userId': UuidValue.fromString(_userId)});
+
+        await handler.create(request);
+
+        expect(fakeService.createUserId, UuidValue.fromString(_userId));
+        expect(
+          fakeService.createSocialNetworkId,
+          UuidValue.fromString(_socialNetworkId),
+        );
+        expect(fakeService.createAccessToken, 'access-token-123');
+        expect(fakeService.createRefreshToken, 'refresh-token-456');
+        expect(
+          fakeService.createTokenExpiresAt,
+          DateTime.utc(2026, 1, 1),
+        );
       });
 
       test('returns 400 for missing required fields', () async {
         final request = _jsonPost('api/social-accounts', {
-          'screenName': _screenName,
+          'refreshToken': 'x',
         }).change(context: {'userId': UuidValue.fromString(_userId)});
 
         expect(() => handler.create(request), throwsA(isA<TypeError>()));
@@ -291,7 +323,7 @@ void main() {
       test('returns 400 for invalid UUID in socialNetworkId', () async {
         final request = _jsonPost('api/social-accounts', {
           'socialNetworkId': 'not-a-uuid',
-          'externalAccountId': _externalAccountId,
+          'accessToken': 'token',
         }).change(context: {'userId': UuidValue.fromString(_userId)});
 
         expect(() => handler.create(request), throwsA(isA<FormatException>()));
@@ -326,7 +358,7 @@ void main() {
 
     group('update', () {
       test('updates screen name and returns safe JSON', () async {
-        fakeDao.updatedAccount = UserSocialAccount(
+        fakeService.updatedAccount = UserSocialAccount(
           id: UuidValue.fromString(_accountId),
           userId: UuidValue.fromString(_userId),
           socialNetworkId: UuidValue.fromString(_socialNetworkId),
@@ -351,7 +383,7 @@ void main() {
       });
 
       test('returns 404 when account not found', () {
-        fakeDao.updatedAccount = null;
+        fakeService.updatedAccount = null;
         final request = _jsonPut('api/social-accounts/$_accountId', {
           'screenName': 'updated-user',
         }).change(context: {'userId': UuidValue.fromString(_userId)});
@@ -373,8 +405,8 @@ void main() {
         );
       });
 
-      test('throws NotFoundException from DAO', () {
-        fakeDao.setException(NotFoundException('Account not found'));
+      test('throws NotFoundException from service', () {
+        fakeService.setException(NotFoundException('Account not found'));
         final request = _jsonPut('api/social-accounts/$_accountId', {
           'screenName': 'x',
         }).change(context: {'userId': UuidValue.fromString(_userId)});
@@ -399,7 +431,7 @@ void main() {
         final body = jsonDecode(await response.readAsString());
         expect(body['ok'], isTrue);
         expect(body['data'], isNull);
-        expect(fakeDao.deleteCallCount, equals(1));
+        expect(fakeService.deleteCallCount, equals(1));
       });
 
       test('returns 400 for invalid UUID', () {
@@ -414,7 +446,7 @@ void main() {
         );
       });
 
-      test('DAO delete is called', () async {
+      test('service delete is called', () async {
         final request = Request(
           'DELETE',
           Uri.parse('http://localhost/api/social-accounts/$_accountId'),
@@ -422,7 +454,7 @@ void main() {
 
         await handler.delete(request, _accountId);
 
-        expect(fakeDao.deleteCallCount, equals(1));
+        expect(fakeService.deleteCallCount, equals(1));
       });
     });
   });
