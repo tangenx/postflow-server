@@ -38,6 +38,7 @@ part './daos/posts_dao.dart';
 part './daos/refresh_tokens_dao.dart';
 part './daos/schedule_dao.dart';
 part './daos/social_account_targets_dao.dart';
+part './daos/social_networks_dao.dart';
 part './daos/user_settings_dao.dart';
 part './daos/user_identities_dao.dart';
 part './daos/user_social_accounts_dao.dart';

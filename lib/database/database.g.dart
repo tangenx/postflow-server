@@ -17950,6 +17950,21 @@ class SocialAccountTargetsDaoManager {
       );
 }
 
+mixin _$SocialNetworksDaoMixin on DatabaseAccessor<PostflowDatabase> {
+  $SocialNetworksTable get socialNetworks => attachedDatabase.socialNetworks;
+  SocialNetworksDaoManager get managers => SocialNetworksDaoManager(this);
+}
+
+class SocialNetworksDaoManager {
+  final _$SocialNetworksDaoMixin _db;
+  SocialNetworksDaoManager(this._db);
+  $$SocialNetworksTableTableManager get socialNetworks =>
+      $$SocialNetworksTableTableManager(
+        _db.attachedDatabase,
+        _db.socialNetworks,
+      );
+}
+
 mixin _$UserSettingsDaoMixin on DatabaseAccessor<PostflowDatabase> {
   $UsersTable get users => attachedDatabase.users;
   $UserSettingsTable get userSettings => attachedDatabase.userSettings;
