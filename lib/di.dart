@@ -16,7 +16,7 @@ import 'handlers/posts_handler.dart';
 import 'handlers/schedule_handler.dart';
 import 'handlers/social_account_target_handler.dart';
 import 'handlers/user_handler.dart';
-import 'handlers/user_social_account_hander.dart';
+import 'handlers/user_social_account_handler.dart';
 import 'services/auth_service.dart';
 import 'services/caption_service.dart';
 import 'services/jwt_service.dart';

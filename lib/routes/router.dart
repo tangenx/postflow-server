@@ -14,7 +14,7 @@ import '../handlers/posts_handler.dart';
 import '../handlers/schedule_handler.dart';
 import '../handlers/social_account_target_handler.dart';
 import '../handlers/user_handler.dart';
-import '../handlers/user_social_account_hander.dart';
+import '../handlers/user_social_account_handler.dart';
 import '../middlewares/auth_middleware.dart';
 import '../middlewares/error_middleware.dart';
 import '../middlewares/logging_middleware.dart';

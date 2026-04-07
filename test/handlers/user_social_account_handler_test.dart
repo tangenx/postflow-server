@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 import 'package:postflow_server/core/exceptions.dart';
 import 'package:postflow_server/database/database.dart';
-import 'package:postflow_server/handlers/user_social_account_hander.dart';
+import 'package:postflow_server/handlers/user_social_account_handler.dart';
 
 // ---------------------------------------------------------------------------
 // Fake DAO
