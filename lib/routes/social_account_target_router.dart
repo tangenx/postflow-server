@@ -1,7 +1,7 @@
 import 'package:shelf_router/shelf_router.dart';
 
 import '../handlers/social_account_target_handler.dart';
-import '../handlers/user_social_account_hander.dart';
+import '../handlers/user_social_account_handler.dart';
 
 Router socialRoutes(
   SocialAccountTargetHandler socialAccountTargetHandler,
