@@ -6,7 +6,7 @@
 
 </div>
 
-This is a server for [Postflow](https://github.com/tangenx/postflow-client)
+This is a server for [Postflow](https://github.com/tangenx/postflow)
 client - a desktop app for managing your anime posting workflow.
 
 ## Epic guide for deploy
