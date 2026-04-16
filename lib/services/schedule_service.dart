@@ -50,7 +50,7 @@ class ScheduleService {
     }
 
     return _db.transaction(() async {
-      final results = List<ScheduleWithDetails>.empty(growable: true);
+      final results = <ScheduleWithDetails>[];
 
       for (final request in requests) {
         if (!(await _socialAccountTargetsDao.belongsToUser(

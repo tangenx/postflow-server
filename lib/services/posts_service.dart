@@ -136,7 +136,7 @@ class PostsService {
   }
 
   Future<List<UuidValue>> _resolveArtists(List<ArtistRef> refs) async {
-    final ids = List<UuidValue>.empty(growable: true);
+    final ids = <UuidValue>[];
 
     for (final ref in refs) {
       if (ref.id != null) {
@@ -155,7 +155,7 @@ class PostsService {
   }
 
   Future<List<UuidValue>> _resolveCharacters(List<CharacterRef> refs) async {
-    final ids = List<UuidValue>.empty(growable: true);
+    final ids = <UuidValue>[];
 
     for (final ref in refs) {
       if (ref.id != null) {
@@ -173,7 +173,7 @@ class PostsService {
   }
 
   Future<List<UuidValue>> _resolveFranchises(List<FranchiseRef> refs) async {
-    final ids = List<UuidValue>.empty(growable: true);
+    final ids = <UuidValue>[];
 
     for (final ref in refs) {
       if (ref.id != null) {
