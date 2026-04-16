@@ -1,6 +1,7 @@
 // epic isolate fail
 import 'dart:async';
 import 'dart:isolate';
+import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
@@ -168,7 +169,7 @@ class PublisherService {
   static List<List<T>> _chunk<T>(List<T> list, int chunkSize) {
     final result = <List<T>>[];
     for (var i = 0; i < list.length; i += chunkSize) {
-      result.add(list.sublist(i, i + chunkSize));
+      result.add(list.sublist(i, min(i + chunkSize, list.length)));
     }
     return result;
   }
